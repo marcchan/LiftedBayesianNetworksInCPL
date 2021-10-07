@@ -1,2 +1,2 @@
 # LiftedBaysianNetworksInCPL
-master project for the unpublished paper written by Dr. Weitkämper
+Master project for the unpublished paper(https://epub.ub.uni-muenchen.de/76444/) written by Dr. Weitkämper 

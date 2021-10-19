@@ -23,7 +23,7 @@ this example will be in the specify domain, for example:
 
 #### GAP:
 
-<img src="/Users/marcchan/Desktop/MT/LiftedBaysianNetworksInCPL/examples/GAP.png" width="50%">
+![](examples/GAP.png)
 
 * **Q:**
     1. 0.8 0.6 is that not probability? is likelihood?

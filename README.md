@@ -9,12 +9,10 @@ The likelihood of a driver being fined depends on two factors:
 the air quality and the  frequency of people driving:
 * For every person, the probability of he drives is 50%
 * When the frequence of drives less than a half, i.e. the number of drives people is less than a half, the probability of good air is 80%;otherwise, is 60%
-* If the air is good, the driver will hardly be fined(10%); if the air is not good and the frequency of drivers less than 70%, the driver will slightly be fined(30%); if the air is not good and the frequency of drivers more than 70%, the driver will be fined be fined Very likely (80%)
+* If the air is good, City will hardly be fined(10%); if the air is not good and the frequency of drivers less than 70%, city will slightly be fined(30%); if the air is not good and the frequency of drivers more than 70%, city will be fined be fined Very likely (80%)
 
 ![](examples/formulas_v1.png)
 
-
-![](examples/formulas_v2.png)
 
 #### Domain:
 this example will be in the specify domain, for example:
@@ -23,19 +21,14 @@ this example will be in the specify domain, for example:
 
 #### GAP:
 
-<img src="/Users/marcchan/Desktop/MT/LiftedBaysianNetworksInCPL/examples/GAP.png" width="50%">
-
-* **Q:**
-    1. 0.8 0.6 is that not probability? is likelihood?
-    2. is the frequency meaning right?
-    3. Fined or Fined(X) ???
-
-
-
+![](examples/GAP.png)
 
 
 ### Task :
 1.
+
+
+
 ## Project requirements
 
 [Python](https://www.python.org/downloads/) 3.7 is required to run this project

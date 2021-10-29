@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "name": "Drives",
+      "type": "int",
+      "domain":"4"
+    },
+    {
+      "name": "Air_is_good",
+      "type": "bool",
+      "domain": "[True, False]"
+    },
+    {
+      "name": "Fined",
+      "type": "bool",
+      "domain": "[True, False]"
+    }
+  ]
+}

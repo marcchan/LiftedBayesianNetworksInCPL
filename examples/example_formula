@@ -1,0 +1,11 @@
+Drives::
+0.5
+
+Air_is_good::
+||Drives <= 0.5|| : 0.8
+||Drives > 0.5|| : 0.6
+
+Fined::
+Air_is_good : 0.1
+!Air_is_good & ||Drives >= 0.7|| : 0.8
+!Air_is_good & ||Drives < 0.7|| : 0.3

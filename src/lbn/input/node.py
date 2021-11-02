@@ -2,8 +2,8 @@ import json
 
 
 class Node():
-    #option
-    evidences:list =[]
+    # option
+    evidences: list = []
     cpd: {}
 
     def __init__(self, name: str, type: str, domain=None):
@@ -32,13 +32,13 @@ class Node():
     def get_evidences(self):
         return self.evidences
 
-    def set_evidences(self,evidences:list):
+    def set_evidences(self, evidences: list):
         self.evidences = evidences
 
     def get_cpd(self):
         return self.cpd
 
-    def set_cpd(self,cpd: dict):
+    def set_cpd(self, cpd: dict):
         self.cpd = cpd
 
 
@@ -55,6 +55,8 @@ def init_nodes_from_json(file_path):
     return nodes
 
 # check and change to valid type of domain
+
+
 def init_valid_node(name: str, type: str, domain):
     if type == 'bool':
         domain = [True, False]

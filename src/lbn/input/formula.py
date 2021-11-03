@@ -2,8 +2,7 @@ from lbn.input.node import init_nodes_from_json
 FORMULA_FILE = '../../../examples/example_formula'
 Domain_FILE = '../../../examples/node_domain'
 
-
-def analyse_formula(formula: str, nodes: list):
+def map_formula(formula: str, nodes: list):
     formula_list = formula.split('\n\n')
     print(f'formula_list =  {formula_list}')
     for node in nodes:
@@ -11,16 +10,17 @@ def analyse_formula(formula: str, nodes: list):
         for fm in formula_list:
             if f'{node.get_name()}::\n' in fm:
                 changed_fm = fm.replace(f'{node.get_name()}::\n', '')
+                changed_fm = changed_fm.replace(' ','')
                 changed_fm_list = changed_fm.split('\n')
-                # print(changed_fm_list)
+                print(changed_fm_list)
                 for changed_fm_part in changed_fm_list:
                     if ':' not in changed_fm_part:
                         dict['self'] = float(changed_fm_part)
                     else:
                         dict[changed_fm_part[
-                             :changed_fm_part.index(' : ')]] \
-                            = changed_fm_part[changed_fm_part.index(' : ') + 3:]
-        node.set_cpd(dict)
+                             :changed_fm_part.index(':')]] \
+                            = changed_fm_part[changed_fm_part.index(':') + 1:]
+        node.set_distributions(dict)
     return nodes
 
 
@@ -31,6 +31,7 @@ def read_formula(formula_file):
 
 nodes = init_nodes_from_json(Domain_FILE)
 
-nodes_ = analyse_formula(read_formula(FORMULA_FILE), nodes)
+nodes_ = map_formula(read_formula(FORMULA_FILE), nodes)
 for node in nodes_:
-    print(node.get_cpd())
+    print(node.get_distributions())
+

@@ -23,12 +23,6 @@ this example will be in the specify domain, for example:
 
 ![](examples/GAP.png)
 
-
-### Task :
-1.
-
-
-
 ## Project requirements
 
 [Python](https://www.python.org/downloads/) 3.7 is required to run this project
@@ -45,3 +39,55 @@ Activate your Environment\
 Install the all needed dependencies\
 `pip install -r requirements.txt`
 
+##  Format Definition:
+ ### Domain
+ * use json format, has 3 attribute: name, type and domain.
+    * type currently has `int`, `bool`, `list`.
+ * For example:
+    ```
+    {
+      "nodes": [
+        {
+          "name": "Drives",
+          "type": "int",
+          "domain":"4"
+        },
+        {
+          "name": "Air_is_good",
+          "type": "bool",
+          "domain": "[True, False]"
+        },
+        {
+          "name": "Fined",
+          "type": "bool",
+          "domain": "[True, False]"
+        }
+      ]
+    }
+   ```
+
+###Formula
+  * `<Nodename> ::`means the following formulas is for `<Nodename>`
+  * Between 2 node formulas there are **`blank line`**  for separation.
+  * Probabilistic logic symbol map:
+    * **`!`**: not
+    * **`|| A ||`**:  the frequence of node A
+    * **`&`**: logical AND
+    * **`|`**: logical OR
+    * **`¬`**: logical NOT
+  * **Example**:
+      ```
+        Drives::
+        0.5
+        
+        Air_is_good::
+        ||Drives <= 0.5|| : 0.8
+        ||Drives > 0.5|| : 0.6
+        
+        Fined::
+        Air_is_good : 0.1
+        !Air_is_good & ||Drives >= 0.7|| : 0.8
+        !Air_is_good & ||Drives < 0.7|| : 0.3
+      ```
+        
+    

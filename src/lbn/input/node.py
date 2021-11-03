@@ -4,7 +4,7 @@ import json
 class Node():
     # option
     evidences: list = []
-    cpd: {}
+    distribution: {}
 
     def __init__(self, name: str, type: str, domain=None):
         self.name = name
@@ -35,11 +35,11 @@ class Node():
     def set_evidences(self, evidences: list):
         self.evidences = evidences
 
-    def get_cpd(self):
-        return self.cpd
+    def get_distributions(self):
+        return self.distribution
 
-    def set_cpd(self, cpd: dict):
-        self.cpd = cpd
+    def set_distributions(self, distributions: dict):
+        self.distribution = distributions
 
 
 def init_nodes_from_json(file_path):

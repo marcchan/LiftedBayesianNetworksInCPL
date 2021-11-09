@@ -3,7 +3,7 @@ import json
 
 class Node():
     # option
-    evidences: list = []
+    # evidences: list = []
     distribution: {}
 
     def __init__(self, name: str, type: str, domain=None):
@@ -29,11 +29,11 @@ class Node():
     def set_domain(self, domain):
         self.domain = domain
 
-    def get_evidences(self):
-        return self.evidences
-
-    def set_evidences(self, evidences: list):
-        self.evidences = evidences
+    # def get_evidences(self):
+    #     return self.evidences
+    #
+    # def set_evidences(self, evidences: list):
+    #     self.evidences = evidences
 
     def get_distributions(self):
         return self.distribution

@@ -19,7 +19,7 @@ def map_formula(formula: str, nodes: list):
                     else:
                         dict[changed_fm_part[
                              :changed_fm_part.index(':')]] \
-                            = changed_fm_part[changed_fm_part.index(':') + 1:]
+                            = float(changed_fm_part[changed_fm_part.index(':') + 1:])
         node.set_distributions(dict)
     return nodes
 

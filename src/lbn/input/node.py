@@ -1,10 +1,10 @@
 import json
 
 
-class Node():
-    # option
-    # evidences: list = []
-    distribution: {}
+class Node(object):
+
+    evidences: set
+    distributions= {}
 
     def __init__(self, name: str, type: str, domain=None):
         self.name = name
@@ -29,17 +29,20 @@ class Node():
     def set_domain(self, domain):
         self.domain = domain
 
-    # def get_evidences(self):
-    #     return self.evidences
-    #
-    # def set_evidences(self, evidences: list):
-    #     self.evidences = evidences
-
     def get_distributions(self):
-        return self.distribution
+        return self.distributions
 
     def set_distributions(self, distributions: dict):
-        self.distribution = distributions
+        self.distributions = distributions
+
+    def get_evidences(self):
+        return self.evidences
+
+    def set_evidences(self, evidences: set):
+        self.evidences = evidences
+
+
+
 
 
 def init_nodes_from_json(file_path):

@@ -1,0 +1,120 @@
+const driveProbability = 0.5;
+const maxNumber = 100;
+const everyFindedProbability = [];
+
+function permutations(m, n){
+    let fenZi = 1;
+    let fenMu = 1;
+    for (let i=n-m+1; i<=n;i++){
+        fenZi *= i
+    }
+    for (let i=1; i<=m;i++){
+        fenMu *= i
+    }
+    return fenZi/fenMu;
+}
+
+let finalFinedMagrinProb = 0
+let finalNotFinedMagrinProb = 0
+
+for (let i = 0; i <= maxNumber; i++) {
+    
+    
+
+    console.group('Drivers number:' + i);
+    let airGoodProbability;
+    const drivePinCi = i/maxNumber ;
+    console.log('Frequency: ||D||:', drivePinCi);
+    const FreqProb = permutations(i, maxNumber) * Math.pow((1 - driveProbability), maxNumber - i) * Math.pow((driveProbability), i)
+    console.log(`P(||D||=${drivePinCi}) = `, FreqProb)
+    console.log(``)
+    console.log(`Air_is_good::\n`)
+
+    if (drivePinCi <= 0.5) {
+        console.log(`||D <= 0.5||`)
+        airGoodProbability = 0.8
+    } else {
+         console.log(`||D > 0.5||`)
+        airGoodProbability = 0.6
+    }
+  
+
+    console.log(`P(Air_is_good = T | ||D||=${drivePinCi}): `, airGoodProbability);
+    console.log(`P(Air_is_good = F | ||D||=${drivePinCi}): `, 1-airGoodProbability);
+    console.log(`P(Air_is_good = T , ||D||=${drivePinCi}): ${airGoodProbability} * ${FreqProb}`);
+    console.log(`P(Air_is_good = F , ||D||=${drivePinCi}): ${1-airGoodProbability} *  ${FreqProb}`);
+    
+    console.log(``)
+    console.log(`Fined::\n`)
+
+    let finedMagrinProb = 0
+    let NotFinedMagrinProb = 0
+
+    // 空气好 概率 x 被罚概率
+    //let finedProbability = airGoodProbability * 0.1;
+    console.log(` P( Fined = T | Air_is_good = T, ||D||=${drivePinCi} ): 0.1 `)
+    console.log(` P( Fined = F | Air_is_good = T, ||D||=${drivePinCi} ): 0.9 `)
+    console.log(` --- P( Fined = T , Air_is_good = T, ||D||=${drivePinCi} ) = 0.1 * P(Air_is_good = T , ||D||=${i}) =`, airGoodProbability * 0.1 * FreqProb);
+    console.log(` --- P( Fined = F | Air_is_good = T, ||D||=${drivePinCi} ) = 0.9 * P(Air_is_good = T , ||D||=${i}) =`, airGoodProbability * (1-0.1) * FreqProb);
+
+    
+    finedMagrinProb += airGoodProbability * 0.1 * FreqProb
+    NotFinedMagrinProb += airGoodProbability * (1-0.1) * FreqProb
+    // 空气不好
+    if (drivePinCi >= 0.7) {
+        // P(Air_is_good = T , ||D||=0.75): 0.8 * P(||D||)
+        // P(Air_is_good = F , ||D||=0.75): 0.2 *  P(||D||)
+        
+        //before airNotGood
+        //const airNotGod = (1- airGoodProbability) * 0.8 * FreqProb;
+        
+
+        console.log(`||D > 0.7 || `)
+        console.log(`P( Fined = T | Air_is_good = F, ||D||=${drivePinCi}): 0.8`);
+        console.log(`P( Fined = F | Air_is_good = F, ||D||=${drivePinCi}): 0.2`);
+
+        console.log(`--- P( Fined = T , Air_is_good = F , ||D||=${drivePinCi}) = 0.8 * P(Air_is_good = F , ||D||=${drivePinCi} ) :  0.8 * ${1-airGoodProbability} *  ${FreqProb}  = `, 0.8 * (1-airGoodProbability) * FreqProb );
+        console.log(`--- P( Fined = F , Air_is_good = F, ||D||=${drivePinCi}) = 0.2 * P(Air_is_good = F , ||D||=${drivePinCi} ) : 0.2 * ${1-airGoodProbability} *  ${FreqProb} = `, 0.2 *  (1-airGoodProbability) * FreqProb);
+
+        //finedProbability += airNotGod
+
+
+        finedMagrinProb += 0.8 * (1-airGoodProbability) * FreqProb
+        NotFinedMagrinProb += 0.2 *  (1-airGoodProbability) * FreqProb
+    } else {
+        // P(Air_is_good = T , ||D||=0): 0.3 * P(||D||)
+        // P(Air_is_good = F , ||D||=0): 0.7 *  P(||D||) 
+
+        //const airNotGod = (1- airGoodProbability) * 0.3;
+        console.log(`||D < 0.7 ||`)
+        console.log(`P( Fined = T | Air_is_good = F, ||D||=${drivePinCi}): 0.3`);
+        console.log(`P( Fined = F | Air_is_good = F, ||D||=${drivePinCi}): 0.7`);
+
+
+
+
+        console.log(`--- P( Fined = T , Air_is_good = F , ||D||=${drivePinCi}) = 0.3 * P(Air_is_good = F , ||D||=${drivePinCi} ) :  0.3 * ${1-airGoodProbability} *  ${FreqProb}  = `, 0.3 * (1-airGoodProbability) * FreqProb );
+        console.log(`--- P( Fined = F , Air_is_good = F, ||D||=${drivePinCi}) = 0.7 * P(Air_is_good = F , ||D||=${drivePinCi} ) : 0.7 * ${1-airGoodProbability} *  ${FreqProb} = `, 0.7 *  (1-airGoodProbability) * FreqProb);
+        //Fined
+
+        //finedProbability += airNotGod;
+
+
+        finedMagrinProb += 0.3 * (1-airGoodProbability) * FreqProb
+        NotFinedMagrinProb += 0.7 *  (1-airGoodProbability) * FreqProb
+    }
+    console.log(`P(F = T | ||D||=${drivePinCi}): ${finedMagrinProb} `);
+    console.log(`P(F = F | ||D||=${drivePinCi}): ${NotFinedMagrinProb} `);
+    //console.log(`P(F = T , ||D||=${drivePinCi}): `, finedProbability * permutations(i, maxNumber) * Math.pow((1 - driveProbability), maxNumber - i) * Math.pow((driveProbability), i) );
+    
+
+
+    console.groupEnd('Drivers number: ' + i);
+    finalFinedMagrinProb += finedMagrinProb
+    finalNotFinedMagrinProb += NotFinedMagrinProb
+
+
+}
+
+console.log(`P(Fined = T ): ${finalFinedMagrinProb} `)
+console.log(`P(Fined = F ): ${finalNotFinedMagrinProb} `)

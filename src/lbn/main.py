@@ -1,59 +1,32 @@
-from lbn.input.node import Node, init_nodes_from_json
-from pgmpy.models import BayesianNetwork
+from pgmpy.models import BayesianModel
+from pgmpy.factors.discrete import TabularCPD
+model = BayesianModel(
+    [('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')])
+cpd_d = TabularCPD(variable='Drives', variable_card=5, values=[
+                   [0.0625], [0.25], [0.375], [0.25], [0.0625]])
+cpd_a = TabularCPD(variable='Air_is_good', variable_card=2, values=[
+    [0.8 * 0.0625, 0.8 * 0.25, 0.8 * 0.375, 0.6 * 0.25, 0.6 * 0.0625],
+    [0.2 * 0.0625, 0.2 * 0.25, 0.2 * 0.375, 0.4 * 0.25, 0.4 * 0.0625]],
+                   evidence=['Drives'],
+                   evidence_card=[5])
+# The representation of CPD in pgmpy is a bit different than the CPD shown in the above picture. In pgmpy the colums
+# are the evidences and rows are the states of the variable. So the grade CPD is represented like this:
+#
+#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+#    | Drives  |   D_0   |   D_0   |   D_1   |   D_1   |   D_2   |   D_2   |   D_3   |   D_3   |   D_4   |   D_4   |
+#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+#    |  A_i_g  | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T |
+#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+#    | Fined_T |
+#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+#    | Fined_F |
+#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
 
+cpd_f = TabularCPD(variable='Fined', variable_card=2, values=[
+    [0.005, 0.00375,  0.02 , 0.015, 0.03,0.0225, 0.015,0.08, 0.00375, 0.02],
+    [0.045, 0.00875, 0.18 , 0.035, 0.27,0.0525, 0.135, 0.02,0.03375,0.005]],
+                   evidence=['Drives','Air_is_good'],
+                   evidence_card=[5,2])
 
-# import nodes obj
-nodes =init_nodes_from_json('../../examples/node_domain')
-# import formula
-# cancer_model = BayesianNetwork([('Pollution', 'Cancer'),
-#                               ('Smoker', 'Cancer'),
-#                               ('Cancer', 'Xray'),
-#                               ('Cancer', 'Dyspnoea')])
-#
-# from pgmpy.factors.discrete import TabularCPD
-#
-# cpd_poll = TabularCPD(variable='Pollution', variable_card=2,
-#                       values=[[0.9], [0.1]])
-# cpd_smoke = TabularCPD(variable='Smoker', variable_card=2,
-#                        values=[[0.3], [0.7]])
-# cpd_cancer = TabularCPD(variable='Cancer', variable_card=2,
-#                         values=[[0.03, 0.05, 0.001, 0.02],
-#                                 [0.97, 0.95, 0.999, 0.98]],
-#                         evidence=['Smoker', 'Pollution'],
-#                         evidence_card=[2, 2])
-# cpd_xray = TabularCPD(variable='Xray', variable_card=2,
-#                       values=[[0.9, 0.2], [0.1, 0.8]],
-#                       evidence=['Cancer'], evidence_card=[2])
-# cpd_dysp = TabularCPD(variable='Dyspnoea', variable_card=2,
-#                       values=[[0.65, 0.3], [0.35, 0.7]],
-#                       evidence=['Cancer'], evidence_card=[2])
-#
-# # Associating the parameters with the model structure.
-# cancer_model.add_cpds(cpd_poll, cpd_smoke, cpd_cancer, cpd_xray, cpd_dysp)
-#
-# # Checking if the cpds are valid for the model.
-# cancer_model.check_model()
-#
-# # Check for d-separation between variables
-# print(cancer_model.is_dconnected('Pollution', 'Smoker'))
-# print(cancer_model.is_dconnected('Pollution', 'Smoker', observed=['Cancer']))
-#
-# # Get all d-connected nodes
-#
-# cancer_model.active_trail_nodes('Pollution')
-#
-# # List local independencies for a node
-#
-# cancer_model.local_independencies('Xray')
-#
-# # Get all model implied independence conditions
-#
-# cancer_model.get_independencies()
-
-
-# from pgmpy.utils import get_example_model
-#
-# model = get_example_model('cancer')
-# print("Nodes in the model:", model.nodes())
-# print("Edges in the model:", model.edges())
-# model.get_cpds()
+model.add_cpds(cpd_d, cpd_a, cpd_f)
+print(model.check_model())

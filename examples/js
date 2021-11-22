@@ -1,5 +1,5 @@
 const driveProbability = 0.5;
-const maxNumber = 100;
+const maxNumber = 4;
 const everyFindedProbability = [];
 
 function permutations(m, n){

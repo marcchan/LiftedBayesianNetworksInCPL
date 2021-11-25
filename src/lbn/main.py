@@ -1,53 +1,40 @@
-from pgmpy.models import BayesianNetwork
-from pgmpy.factors.discrete import TabularCPD
-from pgmpy.inference import VariableElimination
-DAF_model = BayesianNetwork([('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')])
-
-cpd_d = TabularCPD(
-    variable='Drives',
-    variable_card=5,
-    values=[
-        [0.0625],
-        [0.25],
-        [0.375],
-        [0.25],
-        [0.0625]],
-    state_names={'Drives': ['0','1', '2','3','4']})
-cpd_a = TabularCPD(variable='Air_is_good',
-                   variable_card=2,
-                   values=[[0.8, 0.8, 0.8,0.6,0.6],
-                           [0.2,0.2, 0.2, 0.4,0.4]],
-                   evidence=['Drives'],
-                   evidence_card=[5],
-                   state_names={'Air_is_good': ['True', 'False'],'Drives': ['0','1', '2','3','4']})
-# The representation of CPD in pgmpy is a bit different than the CPD shown in the above picture. In pgmpy the colums
-# are the evidences and rows are the states of the variable. So the grade CPD is represented like this:
+# from lbn.input.node import *
+# from lbn.input.formula import *
+# from lbn import *
+# from lbn.parse_formula_into_distribution import *
 #
-#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
-#    | Drives  |   D_0   |   D_0   |   D_1   |   D_1   |   D_2   |   D_2   |   D_3   |   D_3   |   D_4   |   D_4   |
-#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
-#    |  A_i_g  | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T | A_i_g_F | A_i_g_T |
-#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
-#    | Fined_T |  0.3        0.1      0.3         0.1      0.3        0.1      0.8        0.1     0.8         0.1
-#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
-#    | Fined_F |  0.7         0.9       0.7       0.9     0.7         0.9         0.2     0.9     0.2         0.9
-#    +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+#
+# # main
+# # read nodes with distributions into node list objects
+# for node in nodes:
+#     set_evidences_from_distributions(node)
+#     # evidences_dict[node.get_name()] = node.get_evidences()
+#     print(node)
+#
+# # order for the nodes to set up the BN model
+# # ordered_nodes = get_ordered_nodes(nodes)
+# # print(nodes)
+# # print(ordered_nodes)
+# # prob_dict,variable,variable_card,values= generate_cpd_node(ordered_nodes[0])
+# #
+# # state_names = {}
+# # state_names[variable] = prob_dict.keys()
+# # from pgmpy.models import BayesianNetwork
+# # from pgmpy.factors.discrete import TabularCPD
+# # cpd_d = TabularCPD(
+# #     variable= variable,
+# #     variable_card=variable_card,
+# #     values=values,
+# #     state_names=state_names)
+# # print(cpd_d.get_values())
 
-cpd_f = TabularCPD(variable='Fined', variable_card=2, values=[
-    [0.1, 0.3, 0.1, 0.3,0.1, 0.3,0.1,0.8,0.1,0.8],
-    [0.9, 0.7, 0.9, 0.7,0.9,0.7,0.9,0.2,0.9,0.2]],
-                   evidence=['Drives','Air_is_good'],
-                   evidence_card=[5,2],
-                   state_names={'Fined': ['True', 'False'],'Air_is_good': ['True', 'False'],'Drives': ['0','1', '2','3','4']})
 
-DAF_model.add_cpds(cpd_d, cpd_a, cpd_f)
-# print(DAF_model.check_model())
-# print(DAF_model.edges())
-# print(DAF_model.get_cpds('Fined'))
 
-# print(DAF_model.get_cpds('Fined').values)
-infer = VariableElimination(DAF_model)
-# print(infer.query(['Fined'], evidence={'Air_is_good': 'False', 'Drives': '0'}))
-print(infer.query(['Fined','Drives','Air_is_good']))
-print(DAF_model.get_independencies())
-# DAF_model.save('model_file')
+from lbn.input.world import *
+
+FORMULA_FILE = '../../examples/example_formula'
+Domain_FILE = '../../examples/node_domain'
+
+
+nodes = World(FORMULA_FILE,Domain_FILE).get_nodes()
+[print(i) for i in nodes]

@@ -1,10 +1,7 @@
-import json
-
-
 class Node(object):
 
-    evidences: set
-    distributions= {}
+    evidences: set = set()
+    distributions: list = {}
 
     def __init__(self, name: str, type: str, domain=None):
         self.name = name
@@ -41,32 +38,11 @@ class Node(object):
     def set_evidences(self, evidences: set):
         self.evidences = evidences
 
+    def __str__(self):
+        return f'nodename: {self.get_name()},\nDomain: {self.get_domain()},\nType: {self.get_type()},\n' \
+               f'Distributions: {self.get_distributions()},\nevidences: {self.get_evidences()}\n\n'
 
 
 
 
-def init_nodes_from_json(file_path):
-    nodes = []
-    with open(file_path) as json_file:
-        data = json.load(json_file)
-        for node_str in data['nodes']:
-            node = init_valid_node(
-                node_str['name'],
-                node_str['type'],
-                node_str['domain'])
-            nodes.append(node)
-    return nodes
 
-# check and change to valid type of domain
-
-
-def init_valid_node(name: str, type: str, domain):
-    if type == 'bool':
-        domain = [True, False]
-    elif type == 'int':
-        domain = int(domain)
-    return Node(name, type, domain)
-
-# def
-# nodes = init_nodes_from_json('../../../examples/node_domain')
-# print(type(nodes[0].get_domain()))

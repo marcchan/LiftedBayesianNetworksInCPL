@@ -1,31 +1,94 @@
 from lbn.input.node import *
 import json
-class World(object):
+
+
+class Network(object):
 
     def __init__(self, formula_file_path: str, domain_file_path: str):
         self.formula_file_path = formula_file_path
         self.domain_file_path = domain_file_path
         self.nodes = self.generate_world()
+        self.edges = self.set_edges_from_nodes()
+
 
     def get_nodes(self):
         return self.nodes
 
-    def set_nodes(self,nodes):
+    def set_nodes(self, nodes):
         self.nodes = nodes
 
+    def get_edges(self):
+        return self.edges
 
+    def set_edges_from_nodes(self):
+        if len(self.nodes) != 0:
+            edges = []
+            for node in self.nodes:
+                if len(node.get_evidences()) != 0:
+                    for parent_node in node.get_evidences():
+                        list_ = [parent_node, node.get_name()]
+                        edges.append(tuple(list_))
+            return edges
+        else:
+            print('have not inited nodes in set edges')
 
-    def generate_world(self)-> list:
-        unordered_nodes = map_formula(read_formula(self.formula_file_path),
-                            init_nodes_from_json(self.domain_file_path))
+    def generate_world(self) -> list:
+        unordered_nodes = map_formula(
+            read_formula(
+                self.formula_file_path), init_nodes_from_json(
+                self.domain_file_path))
         set_evidences_from_distributions(unordered_nodes)
 
         return check_ordered_nodes(unordered_nodes)
 
+    def get_variable_by_node(self, node:Node):
+        # TODO change freq_node if necessary
+        return node.get_name()
 
-#
+    def set_variable_card(self):
+        self.variable_card =  {node.get_name(): node.get_variable_card() for node in self.nodes}
+
+    def get_variable_card_by_name(self, name: str):
+        return self.variable_card[name]
+
+    # def set_values(self):
+        # todo
+
+    # def get_values_from_node(self, node:Node):
+    #     # todo
+    #     return
+
+
+    def set_evidence_dict(self):
+        evidence_dict = {}
+        for node in self.nodes:
+            list = []
+            if len(node.get_evidences()) == 0:
+                evidence_dict[node.get_name()] = list
+            else:
+                for n in self.nodes:
+                    if n.get_name() in node.get_evidences():
+                        list.append(n.get_name())
+                evidence_dict[node.get_name()] = list
+        # print(evidence_dict)
+        self.evidence_dict = evidence_dict
+    #
+    def get_evidence_dict_by_name(self, nodename: str):
+        if self.evidence_dict != None:
+            return self.evidence_dict[nodename]
+        else:
+            print('variable: evidence_dict has not defined')
+
+    def get_evidence_card_by_name(self, nodename: str):
+        evidence_list = self.get_evidence_dict_by_name(nodename)
+        if len(evidence_list) != 0:
+            return [self.get_variable_card_by_name(ev_name) for ev_name in evidence_list]
+    def get_state_names_by_name(self, nodename: str):
+        return
+
+
+
 # # check and change to valid type of domain
-#
 def init_valid_node(name: str, type: str, domain):
     if type == 'bool':
         domain = [True, False]
@@ -49,12 +112,12 @@ def map_formula(formula: str, nodes: list) -> list:
                     if ':' not in changed_fm_part:
                         dict['self'] = float(changed_fm_part)
                     else:
-                        dict[changed_fm_part[
-                             :changed_fm_part.index(':')]] \
-                            = float(changed_fm_part[changed_fm_part.index(':') + 1:])
+                        dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
+                            changed_fm_part[changed_fm_part.index(':') + 1:])
         node.set_distributions(dict)
     print('--------------- \n')
     return nodes
+
 
 def read_formula(formula_file):
     with open(formula_file, 'r') as f:
@@ -84,6 +147,7 @@ def set_evidences_from_distributions(nodes: list) -> None:
                         evidences.add(node_name)
             node.set_evidences(evidences)
 
+
 def check_ordered_nodes(nodes) -> list:
     '''
 
@@ -109,6 +173,7 @@ def check_ordered_nodes(nodes) -> list:
             unfinished_nodes.insert(0, cur_node)
     return ordered_nodes
 
+
 def init_nodes_from_json(file_path):
     nodes = []
     with open(file_path) as json_file:
@@ -122,13 +187,14 @@ def init_nodes_from_json(file_path):
     return nodes
 
 
-
-
-
 if __name__ == "__main__":
     FORMULA_FILE = '../../../examples/example_formula'
     Domain_FILE = '../../../examples/node_domain'
 
-    world = World(FORMULA_FILE,Domain_FILE)
+    world = Network(FORMULA_FILE, Domain_FILE)
     nodes = world.get_nodes()
-    [print(i) for i in nodes]
+    # [print(i) for i in nodes]
+    print(world.get_edges())
+    # world.set_variable_card()
+    world.set_evidence_dict()
+

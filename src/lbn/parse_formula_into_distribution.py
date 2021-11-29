@@ -1,5 +1,6 @@
 from lbn.input.node import *
 from scipy.special import comb
+import numpy
 
 def check_only_with_frequence(node1: Node, nodes: list) -> bool:
     node_counter, freq_node_counter = 0, 0

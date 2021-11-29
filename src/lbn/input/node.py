@@ -42,7 +42,9 @@ class Node(object):
         return f'nodename: {self.get_name()},\nDomain: {self.get_domain()},\nType: {self.get_type()},\n' \
                f'Distributions: {self.get_distributions()},\nevidences: {self.get_evidences()}\n\n'
 
-
-
-
-
+    def get_variable_card(self):
+        if self.type == 'bool':
+            return int(2)
+        elif self.type == 'int':
+            return int(self.domain + 1)
+        # TODO any other cases

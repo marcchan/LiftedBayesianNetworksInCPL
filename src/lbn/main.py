@@ -14,3 +14,4 @@ nodes = network.get_nodes()
 DAF_model = BayesianNetwork(network.get_edges())
 
 # setup cpdnodes
+# print(network.set_values())

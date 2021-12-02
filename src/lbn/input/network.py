@@ -1,15 +1,20 @@
+import numpy as numpy
 from lbn.input.node import *
 import json
-
+from lbn.parse_formula_into_distribution import *
+from functools import reduce
 
 class Network(object):
 
     def __init__(self, formula_file_path: str, domain_file_path: str):
         self.formula_file_path = formula_file_path
         self.domain_file_path = domain_file_path
-        self.nodes = self.generate_world()
+        self.nodes = self.check_ordered_nodes()
         self.edges = self.set_edges_from_nodes()
-
+        self.set_variable_card()
+        self.set_evidence_dict()
+        # self.set_values()
+        # self.generate_Bayesian_network()
 
     def get_nodes(self):
         return self.nodes
@@ -32,7 +37,7 @@ class Network(object):
         else:
             print('have not inited nodes in set edges')
 
-    def generate_world(self) -> list:
+    def check_ordered_nodes(self) -> list:
         unordered_nodes = map_formula(
             read_formula(
                 self.formula_file_path), init_nodes_from_json(
@@ -41,23 +46,43 @@ class Network(object):
 
         return check_ordered_nodes(unordered_nodes)
 
-    def get_variable_by_node(self, node:Node):
+    def get_variable_by_node(self, node: Node):
         # TODO change freq_node if necessary
         return node.get_name()
 
     def set_variable_card(self):
-        self.variable_card =  {node.get_name(): node.get_variable_card() for node in self.nodes}
+        self.variable_card = {node.get_name(): node.get_variable_card()
+                              for node in self.nodes}
+
+    def get_variable_card(self):
+        return self.variable_card
 
     def get_variable_card_by_name(self, name: str):
         return self.variable_card[name]
 
-    # def set_values(self):
-        # todo
+    def set_values(self):
+        '''
 
-    # def get_values_from_node(self, node:Node):
-    #     # todo
-    #     return
+        :return: None
+        Values: 2D array
+            Drives row = 5, col = 1
+            Air_is_good row = 2, col = 5
+            Fined row = 2, col = 5 * 2
+        '''
+        values_dict = {}
+        for node in self.nodes:
+            row = self.get_variable_card_by_name(node.get_name())
+            column = reduce(
+                lambda x,
+                y: x * y,
+                self.get_evidence_card_by_name(
+                    node.get_name())) if self.get_evidence_dict_by_name(
+                node.get_name()) is not None else 1
+            values_dict[node.get_name()] = fill_data_into_values(node,row,column)
+        self.values_dict = values_dict
 
+    def get_values_by_name(self, name: str):
+        return self.values_dict[name]
 
     def set_evidence_dict(self):
         evidence_dict = {}
@@ -70,22 +95,35 @@ class Network(object):
                     if n.get_name() in node.get_evidences():
                         list.append(n.get_name())
                 evidence_dict[node.get_name()] = list
-        # print(evidence_dict)
         self.evidence_dict = evidence_dict
-    #
+
+    def get_evidence_dict(self):
+        return self.evidence_dict
+
     def get_evidence_dict_by_name(self, nodename: str):
-        if self.evidence_dict != None:
-            return self.evidence_dict[nodename]
+        if self.evidence_dict is not None:
+            res = self.evidence_dict[nodename]
+            if len(res) == 0:
+                return None
+            else:
+                return res
         else:
             print('variable: evidence_dict has not defined')
 
     def get_evidence_card_by_name(self, nodename: str):
         evidence_list = self.get_evidence_dict_by_name(nodename)
-        if len(evidence_list) != 0:
-            return [self.get_variable_card_by_name(ev_name) for ev_name in evidence_list]
-    def get_state_names_by_name(self, nodename: str):
-        return
+        if evidence_list is not None:
+            return [self.get_variable_card_by_name(
+                ev_name) for ev_name in evidence_list]
 
+    # def get_state_names_by_name(self, nodename: str):
+    #     dict = {}
+    #
+    #     return
+
+    # def generate_Bayesian_network(self):
+
+        # self.set_values()
 
 
 # # check and change to valid type of domain
@@ -192,9 +230,10 @@ if __name__ == "__main__":
     Domain_FILE = '../../../examples/node_domain'
 
     world = Network(FORMULA_FILE, Domain_FILE)
-    nodes = world.get_nodes()
-    # [print(i) for i in nodes]
-    print(world.get_edges())
-    # world.set_variable_card()
-    world.set_evidence_dict()
-
+    # print(world.get_variable_card())
+    # print(world.get_evidence_dict())
+    # print(world.get_evidence_card_by_name('Drives'))
+    # print(world.get_evidence_card_by_name('Air_is_good'))
+    # print(world.get_evidence_card_by_name('Fined'))
+    world.set_values()
+    print(world.get_values_by_name('Drives'))

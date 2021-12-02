@@ -48,3 +48,17 @@ class Node(object):
         elif self.type == 'int':
             return int(self.domain + 1)
         # TODO any other cases
+
+    # def set_variable_list(self):
+    #     if self.type == 'bool':
+    #         self.variable_list = [True, False]
+    #     elif self.type == 'int':
+    #         self.variable_list = list(range(self.domain+1))
+    #     # TODO any other type
+    #
+    # def get_variable_list(self):
+    #     return self.variable_list
+    #
+    # def get_variable_card(self):
+    #     return len(self.variable_list)
+    #     # TODO any other cases

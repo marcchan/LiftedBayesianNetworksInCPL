@@ -9,10 +9,10 @@ class Network(object):
     def __init__(self, formula_file_path: str, domain_file_path: str):
         self.formula_file_path = formula_file_path
         self.domain_file_path = domain_file_path
-        self.nodes = self.check_ordered_nodes()
+        self.nodes,self.distributions,self.evidences = self.check_ordered_nodes()
         self.edges = self.set_edges_from_nodes()
         self.set_variable_card()
-        self.set_evidence_dict()
+        # self.set_evidence_dict()
         # self.set_values()
         # self.generate_Bayesian_network()
 
@@ -22,33 +22,42 @@ class Network(object):
     def set_nodes(self, nodes):
         self.nodes = nodes
 
+    def get_evidences(self):
+        return self.evidences
+
+    def get_distrubutions(self):
+        return self.distributions
+
     def get_edges(self):
         return self.edges
 
     def set_edges_from_nodes(self):
         if len(self.nodes) != 0:
             edges = []
-            for node in self.nodes:
-                if len(node.get_evidences()) != 0:
-                    for parent_node in node.get_evidences():
-                        list_ = [parent_node, node.get_name()]
-                        edges.append(tuple(list_))
+            # for node in self.nodes:
+            #     if len(node.get_evidences()) != 0:
+            #         for parent_node in node.get_evidences():
+            #             list_ = [parent_node, node.get_name()]
+            #             edges.append(tuple(list_))
+            # return edges
+            for c_node, p_nodes in self.evidences.items():
+                if len(p_nodes) != 0:
+                    for p_node in p_nodes:
+                        edges.append(tuple([p_node,c_node]))
             return edges
         else:
             print('have not inited nodes in set edges')
 
-    def check_ordered_nodes(self) -> list:
-        unordered_nodes = map_formula(
-            read_formula(
-                self.formula_file_path), init_nodes_from_json(
-                self.domain_file_path))
-        set_evidences_from_distributions(unordered_nodes)
+    def check_ordered_nodes(self):
+        unordered_nodes = init_nodes_from_json(self.domain_file_path)
+        distributions = map_formula(read_formula(self.formula_file_path),unordered_nodes)
+        evidences = set_evidences_from_distributions(unordered_nodes,distributions)
+        nodes = check_ordered_nodes(unordered_nodes,evidences)
+        return nodes, distributions, evidences
 
-        return check_ordered_nodes(unordered_nodes)
-
-    def get_variable_by_node(self, node: Node):
-        # TODO change freq_node if necessary
-        return node.get_name()
+    # def get_variable_by_node(self, node: Node):
+    #     # TODO change freq_node if necessary
+    #     return node.get_name()
 
     def set_variable_card(self):
         self.variable_card = {node.get_name(): node.get_variable_card()
@@ -84,37 +93,37 @@ class Network(object):
     def get_values_by_name(self, name: str):
         return self.values_dict[name]
 
-    def set_evidence_dict(self):
-        evidence_dict = {}
-        for node in self.nodes:
-            list = []
-            if len(node.get_evidences()) == 0:
-                evidence_dict[node.get_name()] = list
-            else:
-                for n in self.nodes:
-                    if n.get_name() in node.get_evidences():
-                        list.append(n.get_name())
-                evidence_dict[node.get_name()] = list
-        self.evidence_dict = evidence_dict
-
-    def get_evidence_dict(self):
-        return self.evidence_dict
-
-    def get_evidence_dict_by_name(self, nodename: str):
-        if self.evidence_dict is not None:
-            res = self.evidence_dict[nodename]
-            if len(res) == 0:
-                return None
-            else:
-                return res
-        else:
-            print('variable: evidence_dict has not defined')
-
-    def get_evidence_card_by_name(self, nodename: str):
-        evidence_list = self.get_evidence_dict_by_name(nodename)
-        if evidence_list is not None:
-            return [self.get_variable_card_by_name(
-                ev_name) for ev_name in evidence_list]
+    # def set_evidence_dict(self):
+    #     evidence_dict = {}
+    #     for node in self.nodes:
+    #         list = []
+    #         if len(node.get_evidences()) == 0:
+    #             evidence_dict[node.get_name()] = list
+    #         else:
+    #             for n in self.nodes:
+    #                 if n.get_name() in node.get_evidences():
+    #                     list.append(n.get_name())
+    #             evidence_dict[node.get_name()] = list
+    #     self.evidence_dict = evidence_dict
+    #
+    # def get_evidence_dict(self):
+    #     return self.evidence_dict
+    #
+    # def get_evidence_dict_by_name(self, nodename: str):
+    #     if self.evidence_dict is not None:
+    #         res = self.evidence_dict[nodename]
+    #         if len(res) == 0:
+    #             return None
+    #         else:
+    #             return res
+    #     else:
+    #         print('variable: evidence_dict has not defined')
+    #
+    # def get_evidence_card_by_name(self, nodename: str):
+    #     evidence_list = self.get_evidence_dict_by_name(nodename)
+    #     if evidence_list is not None:
+    #         return [self.get_variable_card_by_name(
+    #             ev_name) for ev_name in evidence_list]
 
     # def get_state_names_by_name(self, nodename: str):
     #     dict = {}
@@ -125,6 +134,17 @@ class Network(object):
 
         # self.set_values()
 
+def init_nodes_from_json(file_path) -> list:
+    nodes = []
+    with open(file_path) as json_file:
+        data = json.load(json_file)
+        for node_str in data['nodes']:
+            node = init_valid_node(
+                node_str['name'],
+                node_str['type'],
+                node_str['domain'])
+            nodes.append(node)
+    return nodes
 
 # # check and change to valid type of domain
 def init_valid_node(name: str, type: str, domain):
@@ -135,9 +155,9 @@ def init_valid_node(name: str, type: str, domain):
     return Node(name, type, domain)
 
 
-def map_formula(formula: str, nodes: list) -> list:
+def map_formula(formula: str, nodes: list) -> dict:
     formula_list = formula.split('\n\n')
-    print(f'formula_list =  {formula_list}')
+    distributions_dict = {}
     for node in nodes:
         dict = {}
         for fm in formula_list:
@@ -152,9 +172,8 @@ def map_formula(formula: str, nodes: list) -> list:
                     else:
                         dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
                             changed_fm_part[changed_fm_part.index(':') + 1:])
-        node.set_distributions(dict)
-    print('--------------- \n')
-    return nodes
+        distributions_dict[node.get_name()] = dict
+    return distributions_dict
 
 
 def read_formula(formula_file):
@@ -162,10 +181,10 @@ def read_formula(formula_file):
         return f.read()
 
 
-def set_evidences_from_distributions(nodes: list) -> None:
+def set_evidences_from_distributions(nodes: list, distrubutions: dict) -> dict:
     '''
 
-    :param node:  Node
+    :param node:  dict
     from string distribution to extract the relation of other nodes,
     set the evidences as a Set in node object:
         Drives has evidences empty set(),
@@ -173,20 +192,22 @@ def set_evidences_from_distributions(nodes: list) -> None:
 
     '''
     name_list = [node.get_name() for node in nodes]
+    evidences = {}
     for node in nodes:
-        dist = node.get_distributions()
+        dist = distrubutions[node.get_name()]
         if len(dist) == 1:
-            node.set_evidences(set())
+            evidences[node.get_name()] = set()
         else:
-            evidences = set()
+            evidence = set()
             for cond, value in dist.items():
                 for node_name in name_list:
                     if node_name in cond:
-                        evidences.add(node_name)
-            node.set_evidences(evidences)
+                        evidence.add(node_name)
+            evidences[node.get_name()] = evidence
+    return evidences
 
 
-def check_ordered_nodes(nodes) -> list:
+def check_ordered_nodes(nodes: list, evidences: dict) -> list:
     '''
 
     :param nodes:  List[Node]
@@ -201,10 +222,10 @@ def check_ordered_nodes(nodes) -> list:
 
     while len(unfinished_nodes) > 0:
         cur_node = unfinished_nodes.pop()
-        if len(cur_node.get_evidences()) == 0:
+        if len(evidences[cur_node.get_name()]) == 0:
             ordered_nodes_name.append(cur_node.get_name())
             ordered_nodes.append(cur_node)
-        elif cur_node.get_evidences() <= set(ordered_nodes_name):
+        elif evidences[cur_node.get_name()] <= set(ordered_nodes_name):
             ordered_nodes.append(cur_node)
             ordered_nodes_name.append(cur_node.get_name())
         else:
@@ -212,28 +233,17 @@ def check_ordered_nodes(nodes) -> list:
     return ordered_nodes
 
 
-def init_nodes_from_json(file_path):
-    nodes = []
-    with open(file_path) as json_file:
-        data = json.load(json_file)
-        for node_str in data['nodes']:
-            node = init_valid_node(
-                node_str['name'],
-                node_str['type'],
-                node_str['domain'])
-            nodes.append(node)
-    return nodes
-
 
 if __name__ == "__main__":
     FORMULA_FILE = '../../../examples/example_formula'
     Domain_FILE = '../../../examples/node_domain'
 
     world = Network(FORMULA_FILE, Domain_FILE)
-    # print(world.get_variable_card())
+    print(world.get_edges())
+    print(world.get_variable_card())
     # print(world.get_evidence_dict())
     # print(world.get_evidence_card_by_name('Drives'))
     # print(world.get_evidence_card_by_name('Air_is_good'))
     # print(world.get_evidence_card_by_name('Fined'))
-    world.set_values()
-    print(world.get_values_by_name('Drives'))
+    # world.set_values()
+    # print(world.get_values_by_name('Drives'))

@@ -4,14 +4,14 @@ import numpy
 
 
 
-def fill_data_into_values(node: Node, row: int, column: int):
+def fill_data_into_values(node: Node, row: int, column: int, evidences: dict, distrubutions: dict):
     # value = numpy.ndarray([row, column], numpy.float64)
     res_list = []
     # TODO conditon maybe false,  is not always with int
-    if len(node.get_evidences()) == 0:
-        phi: float = node.get_distributions()['self']
+    if len(evidences[node.get_name()]) == 0:
+        phi: float = distrubutions[node.get_name()]['self']
         if node.get_type() == 'int':
-            res_list = setup_bino_dist(phi, node.get_domain()).values()
+            res_list = [setup_bino_dist(phi, node.get_domain()).values()]
 
         elif node.get_type() == 'bool':
             res_list = [phi, 1 - phi]
@@ -19,7 +19,11 @@ def fill_data_into_values(node: Node, row: int, column: int):
         if node.get_type() == 'bool':
             res_list = []
     # print(numpy.array(res_list).reshape(row, column))
-    return numpy.array(res_list).reshape(row, column)
+    print(row)
+    print(column)
+    print(res_list)
+    print(numpy.array(res_list).reshape(row,column))
+    return res_list
 
 
 # def check_only_with_frequence(node1: Node, nodes: list) -> bool:

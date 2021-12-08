@@ -12,7 +12,6 @@ class Network(object):
         self.nodes,self.distributions,self.evidences = self.check_ordered_nodes()
         self.edges = self.set_edges_from_nodes()
         self.set_variable_card()
-        # self.set_evidence_dict()
         # self.set_values()
         # self.generate_Bayesian_network()
 
@@ -78,52 +77,36 @@ class Network(object):
             Air_is_good row = 2, col = 5
             Fined row = 2, col = 5 * 2
         '''
-        values_dict = {}
+        values = {}
         for node in self.nodes:
             row = self.get_variable_card_by_name(node.get_name())
             column = reduce(
                 lambda x,
                 y: x * y,
                 self.get_evidence_card_by_name(
-                    node.get_name())) if self.get_evidence_dict_by_name(
+                    node.get_name())) if self.get_evidence_list_by_name(
                 node.get_name()) is not None else 1
-            values_dict[node.get_name()] = fill_data_into_values(node,row,column)
-        self.values_dict = values_dict
+            values[node.get_name()] = fill_data_into_values(node,row,column,self.evidences,self.distributions)
+        self.values = values
 
     def get_values_by_name(self, name: str):
-        return self.values_dict[name]
+        return self.values[name]
 
-    # def set_evidence_dict(self):
-    #     evidence_dict = {}
-    #     for node in self.nodes:
-    #         list = []
-    #         if len(node.get_evidences()) == 0:
-    #             evidence_dict[node.get_name()] = list
-    #         else:
-    #             for n in self.nodes:
-    #                 if n.get_name() in node.get_evidences():
-    #                     list.append(n.get_name())
-    #             evidence_dict[node.get_name()] = list
-    #     self.evidence_dict = evidence_dict
-    #
-    # def get_evidence_dict(self):
-    #     return self.evidence_dict
-    #
-    # def get_evidence_dict_by_name(self, nodename: str):
-    #     if self.evidence_dict is not None:
-    #         res = self.evidence_dict[nodename]
-    #         if len(res) == 0:
-    #             return None
-    #         else:
-    #             return res
-    #     else:
-    #         print('variable: evidence_dict has not defined')
-    #
-    # def get_evidence_card_by_name(self, nodename: str):
-    #     evidence_list = self.get_evidence_dict_by_name(nodename)
-    #     if evidence_list is not None:
-    #         return [self.get_variable_card_by_name(
-    #             ev_name) for ev_name in evidence_list]
+    def get_evidence_list_by_name(self, nodename: str):
+        if self.evidences is not None:
+            res = self.evidences[nodename]
+            if len(res) == 0:
+                return None
+            else:
+                return list(res)
+        else:
+            print('variable: evidence_dict has not defined')
+
+    def get_evidence_card_by_name(self, nodename: str):
+        evidence_list = self.get_evidence_list_by_name(nodename)
+        if evidence_list is not None:
+            return [self.get_variable_card_by_name(
+                ev_name) for ev_name in evidence_list]
 
     # def get_state_names_by_name(self, nodename: str):
     #     dict = {}
@@ -165,7 +148,7 @@ def map_formula(formula: str, nodes: list) -> dict:
                 changed_fm = fm.replace(f'{node.get_name()}::\n', '')
                 changed_fm = changed_fm.replace(' ', '')
                 changed_fm_list = changed_fm.split('\n')
-                print(changed_fm_list)
+                # print(changed_fm_list)
                 for changed_fm_part in changed_fm_list:
                     if ':' not in changed_fm_part:
                         dict['self'] = float(changed_fm_part)
@@ -241,9 +224,9 @@ if __name__ == "__main__":
     world = Network(FORMULA_FILE, Domain_FILE)
     print(world.get_edges())
     print(world.get_variable_card())
-    # print(world.get_evidence_dict())
-    # print(world.get_evidence_card_by_name('Drives'))
-    # print(world.get_evidence_card_by_name('Air_is_good'))
-    # print(world.get_evidence_card_by_name('Fined'))
-    # world.set_values()
+    print(world.get_evidences())
+    print(world.get_evidence_card_by_name('Drives'))
+    print(world.get_evidence_card_by_name('Air_is_good'))
+    print(world.get_evidence_card_by_name('Fined'))
+    world.set_values()
     # print(world.get_values_by_name('Drives'))

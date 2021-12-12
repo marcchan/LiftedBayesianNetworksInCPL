@@ -1,29 +1,62 @@
 from lbn.input.network import *
 from scipy.special import comb
 import numpy
+import re
+
+def parse_conditional_probability(condition: str, value_dict: dict):
+    for variable, value in value_dict.items():
+        if variable in condition:
+            if type(value) == bool:
+                condition.replace(variable, value)
+            elif type(value) == 'int' or 'float':
+                if bool(re.match(r'||'+variable+'.*||')) == True:
+                    return
 
 
 
-def fill_data_into_values(node: Node, row: int, column: int, evidences: dict, distrubutions: dict):
-    # value = numpy.ndarray([row, column], numpy.float64)
-    res_list = []
-    # TODO conditon maybe false,  is not always with int
-    if len(evidences[node.get_name()]) == 0:
-        phi: float = distrubutions[node.get_name()]['self']
+def check_probability_from_distribution(distribution, card_list, p_names):
+    evi_value_dict = {[p_names[i]] : card_list[i] for i in range(len(card_list))}
+    for cond, value in distribution.item():
+        return
+        # parse_logic(cond)
+
+
+
+def recursive_fill_data(res_matrix,distribution, card_list,p_names):
+    for i in range(len(res_matrix)):
+        card_list.append(i)
+        if type(res_matrix[i]).__name__ == 'ndarray':
+            res_matrix[i] =  recursive_fill_data(res_matrix[i],distribution,card_list,p_names)
+        else:
+            res_matrix[i] = check_probability_from_distribution(distribution,card_list,p_names)
+    return res_matrix
+
+def fill_data_into_values(node: Node, row: int, column: int, evidence: set, distrubution: dict,state_name: dict):
+    if len(evidence) == 0:
+        res_arr = []
+        phi: float = distrubution['self']
         if node.get_type() == 'int':
-            res_list = [setup_bino_dist(phi, node.get_domain()).values()]
-
+            res_arr = list(setup_bino_dist(phi, node.get_domain()).values())
+            print(res_arr)
         elif node.get_type() == 'bool':
-            res_list = [phi, 1 - phi]
+            res_arr = [phi, 1 - phi]
+        return numpy.array(res_arr).reshape(row, column)
     else:
         if node.get_type() == 'bool':
-            res_list = []
-    # print(numpy.array(res_list).reshape(row, column))
-    print(row)
-    print(column)
-    print(res_list)
-    print(numpy.array(res_list).reshape(row,column))
-    return res_list
+            cards =[]
+            p_names = []
+            for p_name in evidence:
+                p_names.append(p_name)
+                cards.append(len(state_name[p_name]))
+            res_matrix = numpy.zeros(cards)
+            res_matrix = recursive_fill_data(cards, res_matrix,distrubution, p_names)
+
+
+
+
+
+
+
 
 
 # def check_only_with_frequence(node1: Node, nodes: list) -> bool:
@@ -56,40 +89,5 @@ def setup_bino_dist(phi: float, domain: int) -> dict:
     return {index:comb(domain, index) * pow(phi, index) * pow(1 - phi,
             domain - index) for index in range(domain + 1)}
 
-# def generate_cpd_node(node: Node):
-#     variable = node.get_name()
-#     if len(node.get_evidences()) == 0:
-#         if node.get_type() == int:
-#             phi: float = node.get_distributions['self']
-#             prob_dict = setup_bino_dist(phi, node.get_domain())
-#             variable_card = len(prob_dict)
-#             values = prob_dict.values()
-#
-#             return prob_dict,variable,variable_card,values
-#     # else:
-#     #     return {}
 
 
-# def model_with_order(ordered_nodes: list):
-#     for node in ordered_nodes:
-#         # node without dependencies
-#         # if len(node.get_evidences()) == 0:
-#         #     probability: float = node.get_distributions['self']
-#         #
-#         #     if check_only_with_frequence(node, ordered_nodes):
-#         #     #     todo setup_freq_dist()
-#         #         # replace_node_to_freqnode(node, probability)
-#         # else:
-#         # todo
-#         return
-
-
-def parse_conditional_probability(distributions: dict):
-    for cond,prob in distributions.items():
-        # parse_condition
-        return
-
-# def
-#
-# def parse_condition(str: str):
-#     if '|' in str:

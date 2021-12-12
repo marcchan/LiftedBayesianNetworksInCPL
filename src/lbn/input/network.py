@@ -12,6 +12,7 @@ class Network(object):
         self.nodes,self.distributions,self.evidences = self.check_ordered_nodes()
         self.edges = self.set_edges_from_nodes()
         self.set_variable_card()
+        self.set_statenames()
         # self.set_values()
         # self.generate_Bayesian_network()
 
@@ -68,6 +69,42 @@ class Network(object):
     def get_variable_card_by_name(self, name: str):
         return self.variable_card[name]
 
+    def get_evidence_list_by_name(self, nodename: str):
+        if self.evidences is not None:
+            res = self.evidences[nodename]
+            if len(res) == 0:
+                return None
+            else:
+                return list(res)
+        else:
+            print('variable: evidence_dict has not defined')
+
+    def get_evidence_card_by_name(self, nodename: str):
+        evidence_list = self.get_evidence_list_by_name(nodename)
+        if evidence_list is not None:
+            return [self.get_variable_card_by_name(
+                ev_name) for ev_name in evidence_list]
+
+    def set_statenames(self):
+        statenames = {}
+        for node in self.nodes:
+            if node.get_type() == 'int':
+                statenames[node.get_name()] = list(range(node.get_domain()+1))
+            elif node.get_type()== 'bool':
+                statenames[node.get_name()] = node.get_domain()
+        self.statenames = statenames
+
+    def get_statenames(self):
+        return self.statenames
+
+    def get_state_names_by_name(self, nodename: str):
+        state_name = {}
+        evidence = self.evidences[nodename]
+        state_name[nodename] = self.statenames[nodename]
+        for evi in evidence:
+            state_name[evi] = self.statenames[evi]
+        return state_name
+
     def set_values(self):
         '''
 
@@ -86,32 +123,11 @@ class Network(object):
                 self.get_evidence_card_by_name(
                     node.get_name())) if self.get_evidence_list_by_name(
                 node.get_name()) is not None else 1
-            values[node.get_name()] = fill_data_into_values(node,row,column,self.evidences,self.distributions)
+            values[node.get_name()] = fill_data_into_values(node,row,column,self.evidences[node.get_name()],self.distributions[node.get_name()],self.get_state_names_by_name(node.get_name()))
         self.values = values
 
     def get_values_by_name(self, name: str):
         return self.values[name]
-
-    def get_evidence_list_by_name(self, nodename: str):
-        if self.evidences is not None:
-            res = self.evidences[nodename]
-            if len(res) == 0:
-                return None
-            else:
-                return list(res)
-        else:
-            print('variable: evidence_dict has not defined')
-
-    def get_evidence_card_by_name(self, nodename: str):
-        evidence_list = self.get_evidence_list_by_name(nodename)
-        if evidence_list is not None:
-            return [self.get_variable_card_by_name(
-                ev_name) for ev_name in evidence_list]
-
-    # def get_state_names_by_name(self, nodename: str):
-    #     dict = {}
-    #
-    #     return
 
     # def generate_Bayesian_network(self):
 
@@ -225,8 +241,12 @@ if __name__ == "__main__":
     print(world.get_edges())
     print(world.get_variable_card())
     print(world.get_evidences())
-    print(world.get_evidence_card_by_name('Drives'))
-    print(world.get_evidence_card_by_name('Air_is_good'))
-    print(world.get_evidence_card_by_name('Fined'))
+    # print(world.get_evidence_card_by_name('Drives'))
+    # print(world.get_evidence_card_by_name('Air_is_good'))
+    # print(world.get_evidence_card_by_name('Fined'))
     world.set_values()
+    # print(world.get_statenames())
+    # print(world.get_state_names_by_name('Drives'))
+    # print(world.get_state_names_by_name('Air_is_good'))
+    # print(world.get_state_names_by_name('Fined'))
     # print(world.get_values_by_name('Drives'))

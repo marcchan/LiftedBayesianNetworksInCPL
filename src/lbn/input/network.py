@@ -4,12 +4,13 @@ import json
 from lbn.parse_formula_into_distribution import *
 from functools import reduce
 
+
 class Network(object):
 
     def __init__(self, formula_file_path: str, domain_file_path: str):
         self.formula_file_path = formula_file_path
         self.domain_file_path = domain_file_path
-        self.nodes,self.distributions,self.evidences = self.check_ordered_nodes()
+        self.nodes, self.distributions, self.evidences = self.check_ordered_nodes()
         self.edges = self.set_edges_from_nodes()
         self.set_variable_card()
         self.set_statenames()
@@ -25,7 +26,7 @@ class Network(object):
     def get_evidences(self):
         return self.evidences
 
-    def get_distrubutions(self):
+    def get_distributions(self):
         return self.distributions
 
     def get_edges(self):
@@ -43,16 +44,20 @@ class Network(object):
             for c_node, p_nodes in self.evidences.items():
                 if len(p_nodes) != 0:
                     for p_node in p_nodes:
-                        edges.append(tuple([p_node,c_node]))
+                        edges.append(tuple([p_node, c_node]))
             return edges
         else:
             print('have not inited nodes in set edges')
 
     def check_ordered_nodes(self):
         unordered_nodes = init_nodes_from_json(self.domain_file_path)
-        distributions = map_formula(read_formula(self.formula_file_path),unordered_nodes)
-        evidences = set_evidences_from_distributions(unordered_nodes,distributions)
-        nodes = check_ordered_nodes(unordered_nodes,evidences)
+        distributions = map_formula(
+            read_formula(
+                self.formula_file_path),
+            unordered_nodes)
+        evidences = set_evidences_from_distributions(
+            unordered_nodes, distributions)
+        nodes = check_ordered_nodes(unordered_nodes, evidences)
         return nodes, distributions, evidences
 
     # def get_variable_by_node(self, node: Node):
@@ -89,8 +94,9 @@ class Network(object):
         statenames = {}
         for node in self.nodes:
             if node.get_type() == 'int':
-                statenames[node.get_name()] = list(range(node.get_domain()+1))
-            elif node.get_type()== 'bool':
+                statenames[node.get_name()] = list(
+                    range(node.get_domain() + 1))
+            elif node.get_type() == 'bool':
                 statenames[node.get_name()] = node.get_domain()
         self.statenames = statenames
 
@@ -117,13 +123,19 @@ class Network(object):
         values = {}
         for node in self.nodes:
             row = self.get_variable_card_by_name(node.get_name())
+            # may be has problem
             column = reduce(
                 lambda x,
                 y: x * y,
                 self.get_evidence_card_by_name(
                     node.get_name())) if self.get_evidence_list_by_name(
                 node.get_name()) is not None else 1
-            values[node.get_name()] = fill_data_into_values(node,row,column,self.evidences[node.get_name()],self.distributions[node.get_name()],self.get_state_names_by_name(node.get_name()))
+            values[node.get_name()] = fill_data_into_values(node,
+                                                            row,
+                                                            column,
+                                                            self.evidences[node.get_name()],
+                                                            self.distributions[node.get_name()],
+                                                            self.get_state_names_by_name(node.get_name()))
         self.values = values
 
     def get_values_by_name(self, name: str):
@@ -132,6 +144,7 @@ class Network(object):
     # def generate_Bayesian_network(self):
 
         # self.set_values()
+
 
 def init_nodes_from_json(file_path) -> list:
     nodes = []
@@ -146,6 +159,8 @@ def init_nodes_from_json(file_path) -> list:
     return nodes
 
 # # check and change to valid type of domain
+
+
 def init_valid_node(name: str, type: str, domain):
     if type == 'bool':
         domain = [True, False]
@@ -180,7 +195,7 @@ def read_formula(formula_file):
         return f.read()
 
 
-def set_evidences_from_distributions(nodes: list, distrubutions: dict) -> dict:
+def set_evidences_from_distributions(nodes: list, distributions: dict) -> dict:
     '''
 
     :param node:  dict
@@ -193,7 +208,7 @@ def set_evidences_from_distributions(nodes: list, distrubutions: dict) -> dict:
     name_list = [node.get_name() for node in nodes]
     evidences = {}
     for node in nodes:
-        dist = distrubutions[node.get_name()]
+        dist = distributions[node.get_name()]
         if len(dist) == 1:
             evidences[node.get_name()] = set()
         else:
@@ -236,17 +251,31 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
 if __name__ == "__main__":
     FORMULA_FILE = '../../../examples/example_formula'
     Domain_FILE = '../../../examples/node_domain'
-
+    #
     world = Network(FORMULA_FILE, Domain_FILE)
-    print(world.get_edges())
-    print(world.get_variable_card())
-    print(world.get_evidences())
+    # print(world.get_edges())
+    # print(world.get_variable_card())
+    # print(world.get_evidences())
+
     # print(world.get_evidence_card_by_name('Drives'))
     # print(world.get_evidence_card_by_name('Air_is_good'))
     # print(world.get_evidence_card_by_name('Fined'))
-    world.set_values()
+
     # print(world.get_statenames())
     # print(world.get_state_names_by_name('Drives'))
-    # print(world.get_state_names_by_name('Air_is_good'))
     # print(world.get_state_names_by_name('Fined'))
+    world.set_values()
     # print(world.get_values_by_name('Drives'))
+    # print(world.get_values_by_name('Air_is_good'))
+
+    # distribution = world.get_distributions()['Fined']
+    # card = [2, 5]
+    # # distribution = {'Air_is_good': 0.1, '!Air_is_good&||Drives>=0.7||': 0.8, '!Air_is_good&||Drives<0.7||': 0.3}
+    # res_matrix = numpy.zeros(card)
+    #
+    # p_names = ['Air_is_good', 'Drives']
+    # state_name = {'Fined': [True, False], 'Air_is_good': [True, False], 'Drives': [0, 1, 2, 3, 4]}
+    # card_list = []
+    # recursive_fill_data(card_list,res_matrix,distribution,p_names,state_name)
+
+

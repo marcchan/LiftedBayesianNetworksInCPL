@@ -27,10 +27,10 @@ class Node(object):
         self.domain = domain
 
     # def get_distributions(self):
-        return self.distributions
+    #     return self.distributions
 
     # def set_distributions(self, distributions: dict):
-        self.distributions = distributions
+    #     self.distributions = distributions
 
     def get_evidences(self):
         return self.evidences

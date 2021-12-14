@@ -14,7 +14,7 @@ class Network(object):
         self.edges = self.set_edges_from_nodes()
         self.set_variable_card()
         self.set_statenames()
-        # self.set_values()
+        self.set_values()
         # self.generate_Bayesian_network()
 
     def get_nodes(self):
@@ -135,7 +135,8 @@ class Network(object):
                                                             column,
                                                             self.evidences[node.get_name()],
                                                             self.distributions[node.get_name()],
-                                                            self.get_state_names_by_name(node.get_name()))
+                                                            self.get_state_names_by_name(node.get_name())).reshape(row,column)
+
         self.values = values
 
     def get_values_by_name(self, name: str):
@@ -177,9 +178,8 @@ def map_formula(formula: str, nodes: list) -> dict:
         for fm in formula_list:
             if f'{node.get_name()}::\n' in fm:
                 changed_fm = fm.replace(f'{node.get_name()}::\n', '')
-                changed_fm = changed_fm.replace(' ', '')
+                # changed_fm = changed_fm.replace(' ', '')
                 changed_fm_list = changed_fm.split('\n')
-                # print(changed_fm_list)
                 for changed_fm_part in changed_fm_list:
                     if ':' not in changed_fm_part:
                         dict['self'] = float(changed_fm_part)
@@ -253,6 +253,7 @@ if __name__ == "__main__":
     Domain_FILE = '../../../examples/node_domain'
     #
     world = Network(FORMULA_FILE, Domain_FILE)
+    # print(world.get_distributions())
     # print(world.get_edges())
     # print(world.get_variable_card())
     # print(world.get_evidences())
@@ -264,10 +265,11 @@ if __name__ == "__main__":
     # print(world.get_statenames())
     # print(world.get_state_names_by_name('Drives'))
     # print(world.get_state_names_by_name('Fined'))
-    world.set_values()
+    # world.set_values()
+
     # print(world.get_values_by_name('Drives'))
     # print(world.get_values_by_name('Air_is_good'))
-
+    # print(world.get_values_by_name('Fined'))
     # distribution = world.get_distributions()['Fined']
     # card = [2, 5]
     # # distribution = {'Air_is_good': 0.1, '!Air_is_good&||Drives>=0.7||': 0.8, '!Air_is_good&||Drives<0.7||': 0.3}
@@ -277,5 +279,7 @@ if __name__ == "__main__":
     # state_name = {'Fined': [True, False], 'Air_is_good': [True, False], 'Drives': [0, 1, 2, 3, 4]}
     # card_list = []
     # recursive_fill_data(card_list,res_matrix,distribution,p_names,state_name)
+    # str = ' not False | 0.0>=0.7'
+    # print(str.replace('&', ' and '))
 
 

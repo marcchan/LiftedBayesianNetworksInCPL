@@ -2,15 +2,8 @@ from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from lbn.input.network import *
-
-FORMULA_FILE = '../../examples/example_formula'
-Domain_FILE = '../../examples/node_domain'
-network = Network(FORMULA_FILE, Domain_FILE)
-nodes = network.get_nodes()
-DAF_model = BayesianNetwork(network.get_edges())
-# DAF_model = BayesianNetwork(
-#     [('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')])
-
+DAF_model = BayesianNetwork(
+    [('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')])
 cpd_d = TabularCPD(
     variable='Drives',
     variable_card=5,
@@ -54,15 +47,10 @@ cpd_f = TabularCPD(
                                         0, 1, 2, 3, 4]})
 
 DAF_model.add_cpds(cpd_d, cpd_a, cpd_f)
+
 print(DAF_model.check_model())
 print(f'Network with edges: {DAF_model.edges()}')
-# print(f'Node Fined with conditional distribution {DAF_model.get_cpds("Fined")}')
 
-# print(type(DAF_model.get_cpds('Fined').values))
-# for value in DAF_model.get_cpds('Fined').values:
-#     for  v in value:
-#         for i in v:
-#             print(type(i))
 infer = VariableElimination(DAF_model)
 print(infer.query(["Fined"]))
 # print(

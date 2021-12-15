@@ -1,10 +1,7 @@
-import json
+class Node(object):
 
-
-class Node():
-    # option
-    # evidences: list = []
-    distribution: {}
+    # evidences: set = set()
+    # distributions: list = {}
 
     def __init__(self, name: str, type: str, domain=None):
         self.name = name
@@ -29,41 +26,38 @@ class Node():
     def set_domain(self, domain):
         self.domain = domain
 
-    # def get_evidences(self):
-    #     return self.evidences
+    # def get_distributions(self):
+    #     return self.distributions
+
+    # def set_distributions(self, distributions: dict):
+    #     self.distributions = distributions
+
+    def get_evidences(self):
+        return self.evidences
+
+    def set_evidences(self, evidences: set):
+        self.evidences = evidences
+
+    def __str__(self):
+        return f'nodename: {self.get_name()},\nDomain: {self.get_domain()},\nType: {self.get_type()}\n'
+
+    def get_variable_card(self):
+        if self.type == 'bool':
+            return int(2)
+        elif self.type == 'int':
+            return int(self.domain + 1)
+        # TODO any other cases
+
+    # def set_variable_list(self):
+    #     if self.type == 'bool':
+    #         self.variable_list = [True, False]
+    #     elif self.type == 'int':
+    #         self.variable_list = list(range(self.domain+1))
+    #     # TODO any other type
     #
-    # def set_evidences(self, evidences: list):
-    #     self.evidences = evidences
-
-    def get_distributions(self):
-        return self.distribution
-
-    def set_distributions(self, distributions: dict):
-        self.distribution = distributions
-
-
-def init_nodes_from_json(file_path):
-    nodes = []
-    with open(file_path) as json_file:
-        data = json.load(json_file)
-        for node_str in data['nodes']:
-            node = init_valid_node(
-                node_str['name'],
-                node_str['type'],
-                node_str['domain'])
-            nodes.append(node)
-    return nodes
-
-# check and change to valid type of domain
-
-
-def init_valid_node(name: str, type: str, domain):
-    if type == 'bool':
-        domain = [True, False]
-    elif type == 'int':
-        domain = int(domain)
-    return Node(name, type, domain)
-
-# def
-# nodes = init_nodes_from_json('../../../examples/node_domain')
-# print(type(nodes[0].get_domain()))
+    # def get_variable_list(self):
+    #     return self.variable_list
+    #
+    # def get_variable_card(self):
+    #     return len(self.variable_list)
+    #     # TODO any other cases

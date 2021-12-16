@@ -135,7 +135,8 @@ class Network(object):
                                                             column,
                                                             self.evidences[node.get_name()],
                                                             self.distributions[node.get_name()],
-                                                            self.get_state_names_by_name(node.get_name())).reshape(row,column)
+                                                            self.get_state_names_by_name(node.get_name())).reshape(row,
+                                                                                                                   column)
 
         self.values = values
 
@@ -247,7 +248,6 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
     return ordered_nodes
 
 
-
 if __name__ == "__main__":
     FORMULA_FILE = '../../../examples/example_formula'
     Domain_FILE = '../../../examples/node_domain'
@@ -281,5 +281,3 @@ if __name__ == "__main__":
     # recursive_fill_data(card_list,res_matrix,distribution,p_names,state_name)
     # str = ' not False | 0.0>=0.7'
     # print(str.replace('&', ' and '))
-
-

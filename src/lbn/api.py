@@ -20,7 +20,13 @@ for node in nodes:
     evidence = network.get_evidence_list_by_name(node.get_name())
     evidence_card = network.get_evidence_card_by_name(node.get_name())
     state_names = network.get_state_names_by_name(node.get_name())
-    cpd_node = TabularCPD(variable, variable_card, values, evidence, evidence_card, state_names)
+    cpd_node = TabularCPD(
+        variable,
+        variable_card,
+        values,
+        evidence,
+        evidence_card,
+        state_names)
     # tabular_cpd_nodes.append(cpd_node)
     DAF_model.add_cpds(cpd_node)
 
@@ -31,4 +37,4 @@ print(infer.query(["Fined"]))
 # conditional probability
 print(infer.query(["Fined"], evidence={"Air_is_good": False}))
 # joint probability
-print(infer.query(["Fined","Drives","Air_is_good"]))
+print(infer.query(["Fined", "Drives", "Air_is_good"]))

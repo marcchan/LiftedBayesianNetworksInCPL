@@ -1,6 +1,7 @@
 import unittest
 from lbn.input.node import Node, init_nodes_from_json
 
+
 class TestNode(unittest.TestCase):
 
     def test_get_name(self):
@@ -21,6 +22,7 @@ class TestNode(unittest.TestCase):
         self.assertEqual(nodes[0].get_domain(), 4)
         self.assertEqual(type(nodes[0].get_domain()), int)
         self.assertEqual(nodes[1].get_domain(), [True, False])
+
 
 if __name__ == '__main__':
     unittest.main()

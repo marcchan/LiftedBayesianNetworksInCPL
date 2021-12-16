@@ -63,9 +63,6 @@ print(infer.query(["Fined"]))
 # DAF_model.save('model_file')
 
 
-
-
-
 # use bip file
 # BNN =  BayesianNetwork([('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')]).load('model_file')
 # infer = VariableElimination(BNN)

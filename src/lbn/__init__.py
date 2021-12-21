@@ -1,7 +1,7 @@
 # from lbn.input.node import *
-# from lbn.input.formula import  *
-# FORMULA_FILE = '../../examples/example_formula'
-# Domain_FILE = '../../examples/node_domain'
+# from lbn.input.formula_v2 import  *
+# FORMULA_FILE = '../../examples/formula_v2'
+# Domain_FILE = '../../examples/domain'
 #
 # nodes = map_formula(
 #     read_formula(FORMULA_FILE),

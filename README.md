@@ -11,7 +11,7 @@ the air quality and the  frequency of people driving:
 * When the frequence of drives less than a half, i.e. the number of drives people is less than a half, the probability of good air is 80%;otherwise, is 60%
 * If the air is good, City will hardly be fined(10%); if the air is not good and the frequency of drivers less than 70%, city will slightly be fined(30%); if the air is not good and the frequency of drivers more than 70%, city will be fined be fined Very likely (80%)
 
-![](examples/formulas_v1.png)
+![](examples/drives_air_fined/formulas_v1.png)
 
 
 #### Domain:
@@ -21,7 +21,7 @@ this example will be in the specify domain, for example:
 
 #### GAP:
 
-![](examples/GAP.png)
+![](examples/drives_air_fined/GAP.png)
 
 ## Project requirements
 

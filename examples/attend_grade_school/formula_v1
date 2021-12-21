@@ -1,0 +1,11 @@
+attends::
+0.9
+
+good_grade::
+0.3
+
+school_good::
+||attends >= 0.95|| & ||good_grade >= 0.30|| : 0.95
+||attends < 0.95|| & ||good_grade >= 0.30|| : 0.9
+||attends >= 0.95|| & ||good_grade < 0.30|| : 0.8
+||attends < 0.95|| & ||good_grade < 0.30|| : 0.3

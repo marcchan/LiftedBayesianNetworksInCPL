@@ -1,0 +1,11 @@
+attends(X)::
+0.9
+
+good_grade(X)::
+0.3
+
+school_good()::
+||attends(x) >= 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.95
+||attends(x) < 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.9
+||attends(x) >= 0.95||_x & ||good_grade(x) < 0.30||_x : 0.8
+||attends(x) < 0.95||_x & ||good_grade(x) < 0.30||_x : 0.3

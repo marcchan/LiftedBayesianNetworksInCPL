@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "name": "attends",
+      "type": "int",
+      "domain":"1"
+    },
+    {
+      "name": "good_grade",
+      "type": "int",
+      "domain": "1"
+    },
+    {
+      "name": "school_good",
+      "type": "bool",
+      "domain": "[True, False]"
+    }
+  ]
+}

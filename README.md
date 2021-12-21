@@ -89,5 +89,24 @@ Install the all needed dependencies\
         !Air_is_good & ||Drives >= 0.7|| : 0.8
         !Air_is_good & ||Drives < 0.7|| : 0.3
       ```
+
         
-    
+### Change Formula V_1    
+ * **Example**:
+    * **Formula**
+      ```
+        Drives:: { X : people }    
+        0.5
+        
+        Fined:: {}
+        ...
+        
+        attends:: { X : student }
+        ||attends(x) >= 0.95|| & ||good_grade(x) >= 0.30|| : 0.95
+        ...
+        
+        friend :: { X : name, Y : name }
+        ...
+        
+        Teaches:: { X: Teacher, Y: student }
+        

@@ -2,6 +2,23 @@ from scipy.special import comb
 import numpy
 import re
 
+# def str_expression_helper(condition: str, variable: str)-> str:
+#     '''
+#
+#     :param condition:
+#     :param variable:
+#     :return:
+#
+#     To Deal with the case:
+#     case 1-2: TOBEDONE in this branch
+#     || A < 0.5|| & B
+#     || A < 0.5 || & || B < 0.5||
+#     case 3-4: TOBEDONE in branch parameter
+#     || A(x) < 0.5||_x & ||B < 0.5||
+#      || A(x) < 0.5||_x & ||B(x) < 0.5||_x
+#
+#     '''
+
 
 def check_probability_from_distribution(
         card_list, distribution, p_names, state_name):
@@ -20,19 +37,19 @@ def check_probability_from_distribution(
                 if isinstance(value, bool):
                     condition = condition.replace(variable, str(value))
                 elif isinstance(value, int):
-                    if bool(
-                        re.search(
-                            r'.*\|\|' +
-                            variable +
-                            '.*\\|\\|',
-                            condition)):
-                        # [0,1,2,3,4]  5-1 = 4
-                        value_ = str(value / (len(state_name[variable]) - 1))
-                        condition = re.sub('\\|\\|', '', condition)
-                        # print(condition)
-                        # print(variable)
-                        condition = re.sub(variable, value_, condition)
-                        # condition.replace(variable,value_)
+                    regex = re.compile(f'\\|\\|{variable}.*?\\|\\|')
+                    c_list = re.findall(regex, condition)
+                    if len(c_list) != 0:
+                        for content in c_list:
+                            value_ = str(
+                                value / (len(state_name[variable]) - 1))
+                            # print(content)
+                            con = content.replace('||', '')
+                            # print(f'con is {con}')
+                            con = con.replace(variable, value_)
+                            # print(f'con after {con}')
+                            condition = re.sub(regex, con, condition, 1)
+
         # print(condition)
         if eval(condition):
             prob = val
@@ -84,7 +101,7 @@ def fill_data_into_values(
         phi: float = distribution['self']
         if node.get_type() == 'int':
             res_arr = list(setup_bino_dist(phi, node.get_domain()).values())
-            # print(res_arr)
+            print(f'node: {node.get_name()} with values {res_arr}')
 
         # TODO friend(x,y)
         elif node.get_type() == 'bool':

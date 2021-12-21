@@ -11,8 +11,11 @@ class Network(object):
         self.formula_file_path = formula_file_path
         self.domain_file_path = domain_file_path
         self.nodes, self.distributions, self.evidences = self.check_ordered_nodes()
+        print(f'nodes:{self.nodes}')
+        print(f'distribution: {self.distributions}')
         self.edges = self.set_edges_from_nodes()
         self.set_variable_card()
+        print(f'variable card: {self.variable_card}')
         self.set_statenames()
         self.set_values()
         # self.generate_Bayesian_network()
@@ -249,8 +252,8 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
 
 
 if __name__ == "__main__":
-    FORMULA_FILE = '../../../examples/example_formula'
-    Domain_FILE = '../../../examples/node_domain'
+    FORMULA_FILE = '../../../examples/drives_air_fined/formula'
+    Domain_FILE = '../../../examples/drives_air_fined/domain'
     #
     world = Network(FORMULA_FILE, Domain_FILE)
     # print(world.get_distributions())

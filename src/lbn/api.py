@@ -3,8 +3,11 @@ from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 
-FORMULA_FILE = '../../examples/example_formula'
-Domain_FILE = '../../examples/node_domain'
+FORMULA_FILE = '../../examples/attend_grade_school/formula_v1'
+Domain_FILE = '../../examples/attend_grade_school/domain'
+
+# FORMULA_FILE = '../../examples/drives_air_fined/formula'
+# Domain_FILE = '../../examples/drives_air_fined/domain'
 
 # generate the complete network nodes
 network = Network(FORMULA_FILE, Domain_FILE)
@@ -31,10 +34,13 @@ for node in nodes:
     DAF_model.add_cpds(cpd_node)
 
 print(f'Network with edges: {DAF_model.edges()}')
-infer = VariableElimination(DAF_model)
+# infer = VariableElimination(DAF_model)
 # margin probability
-print(infer.query(["Fined"]))
+# print(infer.query(["attends"]))
+# print(infer.query(["good_grade"]))
+# print(infer.query(["school_good"]))
+# print(infer.query(["Fined"]))
 # conditional probability
-print(infer.query(["Fined"], evidence={"Air_is_good": False}))
+# print(infer.query(["Fined"], evidence={"Air_is_good": False}))
 # joint probability
-print(infer.query(["Fined", "Drives", "Air_is_good"]))
+# print(infer.query(["Fined", "Drives", "Air_is_good"]))

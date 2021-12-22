@@ -1,0 +1,7 @@
+{
+  "drives":
+    {
+      "type": "int",
+      "domain":"4"
+    }
+}

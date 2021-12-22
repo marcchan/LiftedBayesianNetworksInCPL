@@ -13,11 +13,11 @@ class Network(object):
         self.nodes, self.distributions, self.evidences = self.check_ordered_nodes()
         print(f'nodes:{self.nodes}')
         print(f'distribution: {self.distributions}')
-        self.edges = self.set_edges_from_nodes()
-        self.set_variable_card()
-        print(f'variable card: {self.variable_card}')
-        self.set_statenames()
-        self.set_values()
+        # self.edges = self.set_edges_from_nodes()
+        # self.set_variable_card()
+        # print(f'variable card: {self.variable_card}')
+        # self.set_statenames()
+        # self.set_values()
         # self.generate_Bayesian_network()
 
     def get_nodes(self):
@@ -146,9 +146,13 @@ class Network(object):
     def get_values_by_name(self, name: str):
         return self.values[name]
 
-    # def generate_Bayesian_network(self):
-
-        # self.set_values()
+    def generate_Bayesian_network(self):
+        if self.nodes != None:
+            self.edges = self.set_edges_from_nodes()
+            self.set_variable_card()
+            print(f'variable card: {self.variable_card}')
+            self.set_statenames()
+            self.set_values()
 
 
 def init_nodes_from_json(file_path) -> list:

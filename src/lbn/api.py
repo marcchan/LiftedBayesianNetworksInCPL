@@ -9,12 +9,14 @@ Domain_FILE = '../../examples/attend_grade_school/domain'
 # FORMULA_FILE = '../../examples/drives_air_fined/formula'
 # Domain_FILE = '../../examples/drives_air_fined/domain'
 
-# generate the complete network nodes
 network = Network(FORMULA_FILE, Domain_FILE)
+
+# generate the complete Baysian network
+network.generate_Bayesian_network()
 nodes = network.get_nodes()
 
 # setup bayesian network
-DAF_model = BayesianNetwork(network.get_edges())
+BN_model = BayesianNetwork(network.get_edges())
 # tabular_cpd_nodes = []
 for node in nodes:
     variable = node.get_name()
@@ -31,16 +33,28 @@ for node in nodes:
         evidence_card,
         state_names)
     # tabular_cpd_nodes.append(cpd_node)
-    DAF_model.add_cpds(cpd_node)
+    BN_model.add_cpds(cpd_node)
 
-print(f'Network with edges: {DAF_model.edges()}')
-# infer = VariableElimination(DAF_model)
+print(f'Network with edges: {BN_model.edges()}')
+infer = VariableElimination(BN_model)
+
+
+# Drives
+
 # margin probability
+print(infer.query(["Fined"]))
+
+# conditional probability
+# print(infer.query(["Fined"], evidence={"Air_is_good": False}))
+
+# joint probability
+# print(infer.query(["Fined", "Drives", "Air_is_good"]))
+
+
+
+# School
 # print(infer.query(["attends"]))
 # print(infer.query(["good_grade"]))
 # print(infer.query(["school_good"]))
-# print(infer.query(["Fined"]))
-# conditional probability
-# print(infer.query(["Fined"], evidence={"Air_is_good": False}))
-# joint probability
-# print(infer.query(["Fined", "Drives", "Air_is_good"]))
+
+

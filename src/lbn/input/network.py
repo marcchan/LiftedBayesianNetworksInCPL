@@ -3,6 +3,7 @@ from lbn.input.node import *
 import json
 from lbn.parse_formula_into_distribution import *
 from functools import reduce
+import re
 
 
 class Network(object):
@@ -38,12 +39,6 @@ class Network(object):
     def set_edges_from_nodes(self):
         if len(self.nodes) != 0:
             edges = []
-            # for node in self.nodes:
-            #     if len(node.get_evidences()) != 0:
-            #         for parent_node in node.get_evidences():
-            #             list_ = [parent_node, node.get_name()]
-            #             edges.append(tuple(list_))
-            # return edges
             for c_node, p_nodes in self.evidences.items():
                 if len(p_nodes) != 0:
                     for p_node in p_nodes:
@@ -53,11 +48,9 @@ class Network(object):
             print('have not inited nodes in set edges')
 
     def check_ordered_nodes(self):
-        unordered_nodes = init_nodes_from_json(self.domain_file_path)
-        distributions = map_formula(
-            read_formula(
-                self.formula_file_path),
-            unordered_nodes)
+        # unordered_nodes = init_nodes_from_json(self.domain_file_path)
+        unordered_nodes, distributions = map_formula(
+            read_formula(self.formula_file_path))
         evidences = set_evidences_from_distributions(
             unordered_nodes, distributions)
         nodes = check_ordered_nodes(unordered_nodes, evidences)
@@ -94,6 +87,7 @@ class Network(object):
                 ev_name) for ev_name in evidence_list]
 
     def set_statenames(self):
+        # todo need to change
         statenames = {}
         for node in self.nodes:
             if node.get_type() == 'int':
@@ -102,6 +96,7 @@ class Network(object):
             elif node.get_type() == 'bool':
                 statenames[node.get_name()] = node.get_domain()
         self.statenames = statenames
+
 
     def get_statenames(self):
         return self.statenames
@@ -147,7 +142,7 @@ class Network(object):
         return self.values[name]
 
     def generate_Bayesian_network(self):
-        if self.nodes != None:
+        if self.nodes is not None:
             self.edges = self.set_edges_from_nodes()
             self.set_variable_card()
             print(f'variable card: {self.variable_card}')
@@ -155,52 +150,78 @@ class Network(object):
             self.set_values()
 
 
-def init_nodes_from_json(file_path) -> list:
-    nodes = []
-    with open(file_path) as json_file:
-        data = json.load(json_file)
-        for node_str in data['nodes']:
-            node = init_valid_node(
-                node_str['name'],
-                node_str['type'],
-                node_str['domain'])
-            nodes.append(node)
-    return nodes
+# def init_nodes_from_json(file_path) -> list:
+#     nodes = []
+#     with open(file_path) as json_file:
+#         data = json.load(json_file)
+#         for node_str in data['nodes']:
+#             node = init_valid_node(
+#                 node_str['name'],
+#                 node_str['type'],
+#                 node_str['domain'])
+#             nodes.append(node)
+#     return nodes
 
 # # check and change to valid type of domain
 
-
-def init_valid_node(name: str, type: str, domain):
-    if type == 'bool':
-        domain = [True, False]
-    elif type == 'int':
-        domain = int(domain)
-    return Node(name, type, domain)
-
-
-def map_formula(formula: str, nodes: list) -> dict:
-    formula_list = formula.split('\n\n')
-    distributions_dict = {}
-    for node in nodes:
-        dict = {}
-        for fm in formula_list:
-            if f'{node.get_name()}::\n' in fm:
-                changed_fm = fm.replace(f'{node.get_name()}::\n', '')
-                # changed_fm = changed_fm.replace(' ', '')
-                changed_fm_list = changed_fm.split('\n')
-                for changed_fm_part in changed_fm_list:
-                    if ':' not in changed_fm_part:
-                        dict['self'] = float(changed_fm_part)
-                    else:
-                        dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
-                            changed_fm_part[changed_fm_part.index(':') + 1:])
-        distributions_dict[node.get_name()] = dict
-    return distributions_dict
+#
+# def init_valid_node(name: str, type: str, domain):
+#     if type == 'bool':
+#         domain = [True, False]
+#     elif type == 'int':
+#         domain = int(domain)
+#     return Node(name, type, domain)
 
 
 def read_formula(formula_file):
-    with open(formula_file, 'r') as f:
-        return f.read()
+    try:
+        with open(formula_file, 'r') as f:
+            return f.read()
+    except IOError as e:
+        print(str(e))
+        return None
+
+
+def parse_nodes(node_list: list) -> list:
+    if node_list is None or len(node_list) == 0:
+        print('Can not parse the node attribute from formula')
+        pass
+    else:
+        nodes = []
+        for node in node_list:
+            temp = node.split('::')
+            node_name, node_para = temp[0], temp[1]
+            nodes.append(Node(node_name, node_para))
+        return nodes
+
+
+def map_formula(formula: str):
+    if formula is None:
+        print('Formula read function has error\n')
+    else:
+        # print(formula)
+        node_regex = re.compile(r'.*?::{.*?}')
+        # node_regex = re.compile('.*?::{.*?(.*?\n.*?)*?.*?}', re.I | re.DOTALL)
+        node_list = re.findall(node_regex, formula)
+        # print(node_list)
+        nodes = parse_nodes(node_list)
+        formula_regex = re.compile(r'\n\n')
+        formula_list = re.split(formula_regex, formula)
+        # print(formula_list)
+        distributions_dict = {}
+        if len(nodes) == len(formula_list):
+            for i in range(len(nodes)):
+                temp_dict = {}
+                changed_fm = re.sub(r'.*?::{.*?}\n', '', formula_list[i])
+                changed_fm_list = changed_fm.split('\n')
+                for changed_fm_part in changed_fm_list:
+                    if ':' not in changed_fm_part:
+                        temp_dict['self'] = float(changed_fm_part)
+                    else:
+                        temp_dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
+                            changed_fm_part[changed_fm_part.index(':') + 1:])
+                distributions_dict[nodes[i].get_name()] = temp_dict
+        return nodes, distributions_dict
 
 
 def set_evidences_from_distributions(nodes: list, distributions: dict) -> dict:
@@ -256,10 +277,13 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
 
 
 if __name__ == "__main__":
-    FORMULA_FILE = '../../../examples/drives_air_fined/formula'
-    Domain_FILE = '../../../examples/drives_air_fined/domain'
+    FORMULA_FILE = '../../../examples/drives_air_fined/formula_v1'
+    # Domain_FILE = '../../../examples/drives_air_fined/domain'
+
+    map_formula(read_formula(FORMULA_FILE))
+
     #
-    world = Network(FORMULA_FILE, Domain_FILE)
+    # world = Network(FORMULA_FILE, Domain_FILE)
     # print(world.get_distributions())
     # print(world.get_edges())
     # print(world.get_variable_card())

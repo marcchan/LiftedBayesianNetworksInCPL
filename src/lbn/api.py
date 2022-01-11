@@ -42,7 +42,7 @@ infer = VariableElimination(BN_model)
 # Drives
 
 # margin probability
-print(infer.query(["Fined"]))
+# print(infer.query(["Fined"]))
 
 # conditional probability
 # print(infer.query(["Fined"], evidence={"Air_is_good": False}))
@@ -53,8 +53,10 @@ print(infer.query(["Fined"]))
 
 
 # School
-# print(infer.query(["attends"]))
-# print(infer.query(["good_grade"]))
-# print(infer.query(["school_good"]))
+print(infer.query(["attends"]))
+print(infer.query(["good_grade"]))
+print(infer.query(["school_good"]))
+# conditional probability
+# print(infer.query(["school_good"], evidence={"good_grade": 0,"attends":0}))
 
 

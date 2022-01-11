@@ -3,12 +3,12 @@
     {
       "name": "attends",
       "type": "int",
-      "domain":"1"
+      "domain":"20"
     },
     {
       "name": "good_grade",
       "type": "int",
-      "domain": "1"
+      "domain": "20"
     },
     {
       "name": "school_good",

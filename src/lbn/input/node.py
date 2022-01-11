@@ -1,9 +1,8 @@
 class Node(object):
 
-    def __init__(self, name: str, type: str, domain=None):
+    def __init__(self, name: str, para: dict):
         self.name = name
-        self.type = type
-        self.domain = domain
+        self.para = para
 
     def get_name(self):
         return self.name
@@ -14,6 +13,9 @@ class Node(object):
     def get_domain(self):
         return self.domain
 
+    def get_para(self):
+        return self.para
+
     def set_name(self, name):
         self.name = name
 
@@ -23,15 +25,19 @@ class Node(object):
     def set_domain(self, domain):
         self.domain = domain
 
-    def __str__(self):
-        return f'nodename: {self.get_name()},\nDomain: {self.get_domain()},\nType: {self.get_type()}\n'
+    def set_para(self,para):
+        self.para = para
 
-    def get_variable_card(self):
-        if self.type == 'bool':
-            return int(2)
-        elif self.type == 'int':
-            return int(self.domain + 1)
-        # TODO any other cases
+    def __str__(self):
+        # return f'nodename: {self.get_name()},\nDomain: {self.get_domain()},\nType: {self.get_type()}\n'
+        return f'nodename: {self.get_name()},\n Para: {self.get_para()}\n'
+
+    # def get_variable_card(self):
+    #     if self.type == 'bool':
+    #         return int(2)
+    #     elif self.type == 'int':
+    #         return int(self.domain + 1)
+    #     # TODO any other cases
 
     # def set_variable_list(self):
     #     if self.type == 'bool':

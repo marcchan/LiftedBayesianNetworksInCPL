@@ -99,16 +99,17 @@ def fill_data_into_values(
     if len(evidence) == 0:
         res_arr = []
         phi: float = distribution['self']
-        if node.get_type() == 'int':
-            res_arr = list(setup_bino_dist(phi, node.get_domain()).values())
-            print(f'node: {node.get_name()} with values {res_arr}')
-
-        # TODO friend(x,y)
-        elif node.get_type() == 'bool':
+        if len(node.get_domain()) == 0:
             res_arr = [phi, 1 - phi]
+        elif len(node.get_domain()) == 1:
+            res_arr = list(setup_bino_dist(phi, node.get_variable_card() - 1).values())
+            print(f'node: {node.get_name()} with values {res_arr}')
+        elif len(node.get_domain()) > 1:
+            # TODO friend(x,y)
+            print(f'TODO for case with multi parameter in function fill_data_into_values')
         return numpy.array(res_arr).reshape(row, column)
     else:
-        if node.get_type() == 'bool':
+        if len(node.get_domain()) == 0:
             cards = []
             p_names = []
             for p_name in evidence:

@@ -1,7 +1,2 @@
-{
-  "drives":
-    {
-      "type": "int",
-      "domain":"4"
-    }
-}
+driver: 4
+B : 10

@@ -12,7 +12,7 @@ class Network(object):
         self.domain_file_path = domain_file_path
         self.nodes, self.distributions, self.evidences, self.domains = self.check_ordered_nodes()
         print(f'distribution: {self.distributions}')
-        # self.generate_Bayesian_network()
+        self.edges = self.set_edges_from_nodes()
 
     def get_domains(self):
         return self.domains
@@ -140,7 +140,6 @@ class Network(object):
 
     def generate_bayesian_network(self):
         if self.nodes is not None:
-            self.edges = self.set_edges_from_nodes()
             self.set_variable_card()
             self.set_statenames()
             self.set_values()
@@ -290,10 +289,10 @@ if __name__ == "__main__":
     world = Network(FORMULA_FILE, Domain_FILE)
     print(world.get_distributions())
     print(f'evidences: {world.get_evidences()}')
-    # world.generate_bayesian_network()
-    nodes = world.get_nodes()
-    for n in nodes:
-        print((n.get_para().keys()))
+    world.generate_bayesian_network()
+    # nodes = world.get_nodes()
+    # for n in nodes:
+    #     print((n.get_para().keys()))
     # print(f'edges: {world.get_edges()}')
     # print(f'variable_card: {world.get_variable_card()}')
     # print(f'statenames: {world.get_statenames()}')

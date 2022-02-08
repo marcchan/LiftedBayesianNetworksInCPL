@@ -29,7 +29,7 @@ class Node(object):
         self.para = para
 
     def __str__(self):
-        if self.domain is not None:
+        if self.domain:
             return f'nodename: {self.get_name()},\n Para: {self.get_para()}\n'
         else:
             return f'nodename: {self.get_name()},\n Para: {self.get_para()},\n Domain:{self.get_domain()} '

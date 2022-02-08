@@ -1,12 +1,14 @@
 qualified::{T: teacher}
 0.4
+todo remove
 
 good_teacher::{T: teacher}
-qualified(t) : 0.7
-!qualified(t) : 0.4
+qualified(t): 0.7
+!qualified(t): 0.4
 
-illness::{X: student}
+illness:: {X: student}
 0.05
+todo remove
 
 attends::{X: student}
 !illness(x) & ||good_teacher(t) > 0.5 ||_t : 0.9

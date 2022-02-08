@@ -131,8 +131,8 @@ class Network(object):
                                                             column,
                                                             self.evidences[node.get_name()],
                                                             self.distributions[node.get_name()],
-                                                            self.get_state_names_by_name(node.get_name())).reshape(row,
-                                                                                                                   column)
+                                                            self.get_state_names_by_name(node.get_name()),
+                                                            self.nodes).reshape(row,column)
         self.values = values
 
     def get_values_by_name(self, name: str):
@@ -284,15 +284,18 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
 
 
 if __name__ == "__main__":
-    FORMULA_FILE = '../../../examples/drives_air_fined/formula_v1'
+    FORMULA_FILE = '../../../examples/drives_air_fined/formula_v2'
     Domain_FILE = '../../../examples/drives_air_fined/domain_v1'
 
     world = Network(FORMULA_FILE, Domain_FILE)
     print(world.get_distributions())
     print(f'evidences: {world.get_evidences()}')
-    world.generate_bayesian_network()
+    # world.generate_bayesian_network()
+    nodes = world.get_nodes()
+    for n in nodes:
+        print((n.get_para().keys()))
+    # print(f'edges: {world.get_edges()}')
+    # print(f'variable_card: {world.get_variable_card()}')
+    # print(f'statenames: {world.get_statenames()}')
 
-    print(f'edges: {world.get_edges()}')
-    print(f'variable_card: {world.get_variable_card()}')
-    print(f'statenames: {world.get_statenames()}')
-
+    # regex_all = re.complie(r'\|\|.*?{variable}.*?\|\|(_[a-z]){0,}')

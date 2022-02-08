@@ -7,8 +7,8 @@ class Node(object):
     def get_name(self):
         return self.name
 
-    def get_type(self):
-        return self.type
+    # def get_type(self):
+        # return self.type
 
     def get_domain(self):
         return self.domain
@@ -19,8 +19,8 @@ class Node(object):
     def set_name(self, name):
         self.name = name
 
-    def set_type(self, type):
-        self.type = type
+    # def set_type(self, type):
+    #     self.type = type
 
     def set_domain(self, domain):
         self.domain = domain

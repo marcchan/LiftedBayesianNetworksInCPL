@@ -1,10 +1,10 @@
 attends::{X: student}
 0.9
 
-good_grade(X)::{X: student}
+good_grade::{X: student}
 0.3
 
-school_good()::{}
+school_good::{}
 ||attends(x) >= 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.95
 ||attends(x) < 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.9
 ||attends(x) >= 0.95||_x & ||good_grade(x) < 0.30||_x : 0.8

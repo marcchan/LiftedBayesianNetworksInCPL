@@ -1,0 +1,26 @@
+qualified::{T: teacher}
+0.4
+todo remove
+
+good_teacher::{T: teacher}
+qualified(t): 0.7
+!qualified(t): 0.4
+
+illness:: {X: student}
+0.05
+todo remove
+
+attends::{X: student}
+!illness(x) & ||good_teacher(t) > 0.5 ||_t : 0.9
+!illness(x) & ||good_teacher(t) <= 0.5 ||_t : 0.8
+illness(x) :0.1
+
+good_grade::{X: student}
+||good_teacher(t) > 0.5||_t : 0.4
+||good_teacher(t) <= 0.5||_t : 0.2
+
+good_school::{}
+||attends(x) >= 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.95
+||attends(x) < 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.9
+||attends(x) >= 0.95||_x & ||good_grade(x) < 0.30||_x : 0.8
+||attends(x) < 0.95||_x & ||good_grade(x) < 0.30||_x : 0.3

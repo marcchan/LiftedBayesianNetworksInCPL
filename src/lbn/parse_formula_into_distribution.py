@@ -243,7 +243,7 @@ def fill_data_into_values(
         nodes: list):
     if len(evidence) == 0:
         res_arr = []
-        phi: float = distribution['self']
+        phi: float = float(distribution['self'])
         if len(node.get_domain()) == 0:
             res_arr = [phi, 1 - phi]
         elif len(node.get_domain()) == 1:

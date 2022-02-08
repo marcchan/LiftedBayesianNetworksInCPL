@@ -12,7 +12,6 @@ class Network(object):
         self.domain_file_path = domain_file_path
         self.nodes, self.distributions, self.evidences, self.domains = self.check_ordered_nodes()
         print(f'distribution: {self.distributions}')
-        self.edges = self.set_edges_from_nodes()
 
     def get_domains(self):
         return self.domains
@@ -139,11 +138,16 @@ class Network(object):
         return self.values[name]
 
     def generate_bayesian_network(self):
+        self.pre_computing()
         if self.nodes is not None:
             self.set_variable_card()
             self.set_statenames()
             self.set_values()
 
+    def pre_computing(self):
+        self.edges = self.set_edges_from_nodes()
+        print(self.evidences)
+        check_redundancy(self.edges)
 
 def read_file(formula_file):
     try:
@@ -204,7 +208,7 @@ def parse_formula(formula: str):
         print('Formula read function has error\n')
     else:
         # print(formula)
-        node_regex = re.compile(r'.*?::{.*?}')
+        node_regex = re.compile(r'.*?::[ ]*?\{.*?\}')
         # node_regex = re.compile('.*?::{.*?(.*?\n.*?)*?.*?}', re.I | re.DOTALL)
         node_list = re.findall(node_regex, formula)
         # print(node_list)
@@ -216,14 +220,17 @@ def parse_formula(formula: str):
         if len(nodes) == len(formula_list):
             for i in range(len(nodes)):
                 temp_dict = {}
-                changed_fm = re.sub(r'.*?::{.*?}\n', '', formula_list[i])
+                changed_fm = re.sub(r'.*?::[ ]*?\{.*?\}\n', '', formula_list[i])
                 changed_fm_list = changed_fm.split('\n')
                 for changed_fm_part in changed_fm_list:
                     if ':' not in changed_fm_part:
-                        temp_dict['self'] = float(changed_fm_part)
+                        # temp_dict['self'] = float(changed_fm_part)
+                        temp_dict['self'] = changed_fm_part
                     else:
-                        temp_dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
-                            changed_fm_part[changed_fm_part.index(':') + 1:])
+                        # temp_dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
+                        #     changed_fm_part[changed_fm_part.index(':') + 1:])
+                        temp_dict[changed_fm_part[:changed_fm_part.index(':')]] = \
+                            changed_fm_part[changed_fm_part.index(':') + 1:]
                 distributions_dict[nodes[i].get_name()] = temp_dict
         return nodes, distributions_dict
 
@@ -281,15 +288,18 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
             unfinished_nodes.insert(0, cur_node)
     return ordered_nodes
 
+def check_redundancy(edges: list):
+    print(edges)
+
 
 if __name__ == "__main__":
-    FORMULA_FILE = '../../../examples/drives_air_fined/formula_v2'
-    Domain_FILE = '../../../examples/drives_air_fined/domain_v1'
-
-    world = Network(FORMULA_FILE, Domain_FILE)
-    print(world.get_distributions())
-    print(f'evidences: {world.get_evidences()}')
-    world.generate_bayesian_network()
+    # FORMULA_FILE = '../../../examples/drives_air_fined/formula_v2'
+    # Domain_FILE = '../../../examples/drives_air_fined/domain_v1'
+    #
+    # world = Network(FORMULA_FILE, Domain_FILE)
+    # print(world.get_distributions())
+    # print(f'evidences: {world.get_evidences()}')
+    # world.generate_bayesian_network()
     # nodes = world.get_nodes()
     # for n in nodes:
     #     print((n.get_para().keys()))
@@ -298,3 +308,9 @@ if __name__ == "__main__":
     # print(f'statenames: {world.get_statenames()}')
 
     # regex_all = re.complie(r'\|\|.*?{variable}.*?\|\|(_[a-z]){0,}')
+
+    FORMULA_FILE = '../../../examples/pre_computing_case/formula_v2'
+    Domain_FILE = '../../../examples/pre_computing_case/domain'
+    network_pre = Network(FORMULA_FILE, Domain_FILE)
+    network_pre.pre_computing()
+

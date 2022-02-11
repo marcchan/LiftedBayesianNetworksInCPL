@@ -6,12 +6,11 @@ import re
 
 
 class Network(object):
-
-    def __init__(self, formula_file_path: str, domain_file_path: str):
-        self.formula_file_path = formula_file_path
-        self.domain_file_path = domain_file_path
-        self.nodes, self.distributions, self.evidences, self.domains = self.check_ordered_nodes()
-        print(f'distribution: {self.distributions}')
+    def __init__(self, nodes, distributions, evidences, domains):
+        self.nodes = nodes
+        self.distributions = distributions
+        self.evidences = evidences
+        self.domains = domains
 
     def get_domains(self):
         return self.domains
@@ -32,7 +31,7 @@ class Network(object):
         return self.distributions
 
     def get_edges(self):
-        return self.edges
+        return self.edges if hasattr(self, 'edges') else None
 
     def set_edges_from_nodes(self):
         if len(self.nodes) != 0:
@@ -45,22 +44,12 @@ class Network(object):
         else:
             print('have not inited nodes in set edges')
 
-    def check_ordered_nodes(self):
-        unordered_nodes, distributions = parse_formula(
-            read_file(self.formula_file_path))
-        temp_nodes, domains = parse_domain(
-            self.domain_file_path, unordered_nodes)
-        evidences = set_evidences_from_distributions(
-            temp_nodes, distributions)
-        nodes = check_ordered_nodes(temp_nodes, evidences)
-        return nodes, distributions, evidences, domains
-
     def set_variable_card(self):
         self.variable_card = {node.get_name(): node.get_variable_card()
                               for node in self.nodes}
 
     def get_variable_card(self):
-        return self.variable_card
+        return self.variable_card if hasattr(self, 'variable_card') else None
 
     def get_variable_card_by_name(self, name: str):
         return self.variable_card[name]
@@ -95,7 +84,7 @@ class Network(object):
         self.statenames = statenames
 
     def get_statenames(self):
-        return self.statenames
+        return self.statenames if hasattr(self, 'statenames') else None
 
     def get_state_names_by_name(self, nodename: str):
         state_name = {}
@@ -140,14 +129,30 @@ class Network(object):
     def generate_bayesian_network(self):
         self.pre_computing()
         if self.nodes is not None:
+            self.edges = self.set_edges_from_nodes()
             self.set_variable_card()
             self.set_statenames()
             self.set_values()
 
     def pre_computing(self):
-        self.edges = self.set_edges_from_nodes()
-        print(self.evidences)
-        check_redundancy(self.edges)
+        name_list = [node.get_name() for node in self.nodes]
+        redundance = check_redundancy(name_list, self.evidences)
+        update_distributions_from_nodes(self, redundance)
+
+    def __str__(self):
+        # check if generate_bayesian_network
+        # if not hasattr(self,'edges'):
+            return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n'
+
+def update_distributions_from_nodes(network: Network, redundance: set):
+    evidences = network.get_evidences()
+    distributions = network.get_distributions()
+    domains =network.get_domains()
+    updated_nodes = [node for node in network.get_nodes() if node.get_name() not in redundance]
+    # nodes, domains , distributions, evidences TODO update
+    for remove_name in redundance:
+        distributions[remove_name]
+
 
 def read_file(formula_file):
     try:
@@ -208,7 +213,8 @@ def parse_formula(formula: str):
         print('Formula read function has error\n')
     else:
         # print(formula)
-        node_regex = re.compile(r'.*?::[ ]*?\{.*?\}')
+        # node_regex = re.compile(r'.*?::[ ]*?\{.*?\}')
+        node_regex = re.compile(r'.*?::[ ]*?{.*?}')
         # node_regex = re.compile('.*?::{.*?(.*?\n.*?)*?.*?}', re.I | re.DOTALL)
         node_list = re.findall(node_regex, formula)
         # print(node_list)
@@ -220,7 +226,9 @@ def parse_formula(formula: str):
         if len(nodes) == len(formula_list):
             for i in range(len(nodes)):
                 temp_dict = {}
-                changed_fm = re.sub(r'.*?::[ ]*?\{.*?\}\n', '', formula_list[i])
+                # redundance
+                # changed_fm = re.sub(r'.*?::[ ]*?\{.*?\}\n', '', formula_list[i])
+                changed_fm = re.sub(r'.*?::[ ]*?{.*?}\n', '', formula_list[i])
                 changed_fm_list = changed_fm.split('\n')
                 for changed_fm_part in changed_fm_list:
                     if ':' not in changed_fm_part:
@@ -262,7 +270,7 @@ def set_evidences_from_distributions(nodes: list, distributions: dict) -> dict:
     return evidences
 
 
-def check_ordered_nodes(nodes: list, evidences: dict) -> list:
+def sort_nodes(nodes: list, evidences: dict) -> list:
     """
 
     :param evidences:
@@ -288,15 +296,37 @@ def check_ordered_nodes(nodes: list, evidences: dict) -> list:
             unfinished_nodes.insert(0, cur_node)
     return ordered_nodes
 
-def check_redundancy(edges: list):
-    print(edges)
+def parse_to_network(formula_file_path: str, domain_file_path: str):
+    unordered_nodes, distributions = parse_formula(
+        read_file(formula_file_path))
+    temp_nodes, domains = parse_domain(
+        domain_file_path, unordered_nodes)
+    evidences = set_evidences_from_distributions(
+        temp_nodes, distributions)
+    nodes = sort_nodes(temp_nodes, evidences)
+    return Network(nodes, distributions, evidences, domains)
+
+def check_redundancy(name_list: list, evidences: dict):
+    redunance_list = set()
+    # print(name_list)
+    # print(evidences)
+    for node_name in name_list[::-1]:
+        if len(evidences[node_name]) == 0:
+                redunance_list.add(node_name)
+        else:
+            if node_name in redunance_list:
+                redunance_list.pop(node_name)
+            redunance_list.union(evidences[node_name])
+    # print(redunance_list)
+    return redunance_list
 
 
 if __name__ == "__main__":
-    # FORMULA_FILE = '../../../examples/drives_air_fined/formula_v2'
-    # Domain_FILE = '../../../examples/drives_air_fined/domain_v1'
+    FORMULA_FILE = '../../../examples/drives_air_fined/formula_v2'
+    Domain_FILE = '../../../examples/drives_air_fined/domain_v1'
     #
-    # world = Network(FORMULA_FILE, Domain_FILE)
+    network = parse_to_network(FORMULA_FILE,Domain_FILE)
+    print(network)
     # print(world.get_distributions())
     # print(f'evidences: {world.get_evidences()}')
     # world.generate_bayesian_network()
@@ -309,8 +339,8 @@ if __name__ == "__main__":
 
     # regex_all = re.complie(r'\|\|.*?{variable}.*?\|\|(_[a-z]){0,}')
 
-    FORMULA_FILE = '../../../examples/pre_computing_case/formula_v2'
-    Domain_FILE = '../../../examples/pre_computing_case/domain'
-    network_pre = Network(FORMULA_FILE, Domain_FILE)
-    network_pre.pre_computing()
+    # FORMULA_FILE = '../../../examples/pre_computing_case/formula_v2'
+    # Domain_FILE = '../../../examples/pre_computing_case/domain'
+    # network_pre = Network(FORMULA_FILE, Domain_FILE)
+    # network_pre.pre_computing()
 

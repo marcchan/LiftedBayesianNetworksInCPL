@@ -9,6 +9,5 @@ class TestNode(unittest.TestCase):
         self.assertEqual(node1.get_name(), "Drives")
 
 
-
 if __name__ == '__main__':
     unittest.main()

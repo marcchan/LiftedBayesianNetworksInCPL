@@ -1,13 +1,13 @@
 import unittest
 from lbn.parse_formula_into_distribution import *
-from lbn.input.network import Network
+from lbn.input.network import parse_to_network,Network
 
 
 class TestNode(unittest.TestCase):
     def test_get_lower_para_fron_node(self):
         FORMULA_FILE_drives = '../examples/attend_grade_school/formula_v2'
         Domain_FILE_drives = '../examples/attend_grade_school/domain_v1'
-        network = Network(FORMULA_FILE_drives, Domain_FILE_drives)
+        network = parse_to_network(FORMULA_FILE_drives, Domain_FILE_drives)
         nodes = network.get_nodes()
         self.assertEqual(('(x)', '_x'), get_lower_para_from_node(nodes[0]))
         self.assertEqual(('(x)', '_x'), get_lower_para_from_node(nodes[1]))
@@ -16,12 +16,12 @@ class TestNode(unittest.TestCase):
     def test_str_expression_helper(self):
         FORMULA_FILE_school = '../examples/attend_grade_school/formula_v2'
         Domain_FILE_school = '../examples/attend_grade_school/domain_v1'
-        network_ags = Network(FORMULA_FILE_school, Domain_FILE_school)
+        network_ags = parse_to_network(FORMULA_FILE_school, Domain_FILE_school)
         nodes_ags = network_ags.get_nodes()
 
         FORMULA_FILE_drives = '../examples/drives_air_fined/formula_v2'
         Domain_FILE_drives = '../examples/drives_air_fined/domain_v1'
-        network_daf = Network(FORMULA_FILE_drives, Domain_FILE_drives)
+        network_daf = parse_to_network(FORMULA_FILE_drives, Domain_FILE_drives)
         nodes_daf = network_daf.get_nodes()
         # # v_2
         # # air_is_good

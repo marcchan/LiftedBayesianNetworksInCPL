@@ -11,7 +11,7 @@ illness::{X: student}
 attends::{X: student}
 !illness(x) & ||good_teacher(t) > 0.5 ||_t : 0.9
 !illness(x) & ||good_teacher(t) <= 0.5 ||_t : 0.8
-illness(x) :0.1
+illness(x) : 0.1
 
 good_grade::{X: student}
 ||good_teacher(t) > 0.5||_t : 0.4

@@ -28,11 +28,17 @@ class Node(object):
     def set_para(self,para:dict):
         self.para = para
 
-    def __str__(self):
-        if self.domain:
-            return f'nodename: {self.get_name()},\n Para: {self.get_para()}\n'
+    def to_str(self):
+        if not hasattr(self,'domain'):
+            return f'name: {self.get_name()}, Para: {self.get_para()}'
         else:
-            return f'nodename: {self.get_name()},\n Para: {self.get_para()},\n Domain:{self.get_domain()} '
+            return f'name: {self.get_name()}, Para: {self.get_para()}, Domain:{self.get_domain()}'
+
+    def __str__(self):
+        if not hasattr(self,'domain'):
+            return f'    nodename: {self.get_name()}\n    Para: {self.get_para()}\n'
+        else:
+            return f'   nodename: {self.get_name()},\n    Para: {self.get_para()},\n    Domain:{self.get_domain()} '
 
     def get_variable_card(self) -> int:
         """

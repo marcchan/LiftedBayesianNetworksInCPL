@@ -11,7 +11,7 @@ Domain_FILE = '../../examples/attend_grade_school/domain_v1'
 
 def generate_bn_model(file_path_formula: str, file_path_domain: str):
 
-    network = Network(file_path_formula, file_path_domain)
+    network = parse_to_network(file_path_formula, file_path_domain)
 
     # generate the complete Baysian network
     network.generate_bayesian_network()

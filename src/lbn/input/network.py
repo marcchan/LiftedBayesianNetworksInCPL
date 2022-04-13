@@ -33,14 +33,23 @@ class Network(object):
     def get_edges(self):
         return self.edges if hasattr(self, 'edges') else None
 
+    def get_freq_edges(self):
+        return self.freq_edges if hasattr(self, 'freq_edges') else None
+
     def set_edges_from_nodes(self):
         if len(self.nodes) != 0:
-            edges = []
+            edges, freq_edges = [], []
             for c_node, p_nodes in self.evidences.items():
                 if len(p_nodes) != 0:
                     for p_node in p_nodes:
                         edges.append(tuple([p_node, c_node]))
-            return edges
+                        for key, value in self.distributions[c_node].items():
+                            if (len(re.findall(r'\|\|.*?'+p_node+'.*?\|\|', key)) != 0) & (tuple([p_node,c_node]) not in freq_edges):
+                                freq_edges.append((tuple([p_node,c_node])))
+            self.edges= edges
+            self.freq_edges = freq_edges
+            print(self.edges)
+            print(f'freq_edges{self.freq_edges}')
         else:
             print('have not inited nodes in set edges')
 
@@ -127,31 +136,46 @@ class Network(object):
         return self.values[name]
 
     def generate_bayesian_network(self):
-        self.pre_computing()
+
+        # self.pre_computing()
         if self.nodes is not None:
-            self.edges = self.set_edges_from_nodes()
             self.set_variable_card()
             self.set_statenames()
             self.set_values()
 
-    def pre_computing(self):
-        name_list = [node.get_name() for node in self.nodes]
-        redundance = check_redundancy(name_list, self.evidences)
-        update_distributions_from_nodes(self, redundance)
+    # def pre_computing(self):
+        # self.set_edges_from_nodes()
+        #     name_list = [node.get_name() for node in self.nodes]
+        #     redundance = find_redundancy_network(name_list, self.evidences)
+        #     # get_edges_no_freq(self)
+        #     # update_distributions_from_nodes(self, redundance)
 
     def __str__(self):
         # check if generate_bayesian_network
         # if not hasattr(self,'edges'):
-            return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n'
+        return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n'
 
-def update_distributions_from_nodes(network: Network, redundance: set):
-    evidences = network.get_evidences()
-    distributions = network.get_distributions()
-    domains =network.get_domains()
-    updated_nodes = [node for node in network.get_nodes() if node.get_name() not in redundance]
-    # nodes, domains , distributions, evidences TODO update
-    for remove_name in redundance:
-        distributions[remove_name]
+# def get_edges_no_freq(network: Network):
+#     if not hasattr(network,'edges'):
+#         network.set_edges_from_nodes()
+#     edges = network.get_edges()
+#     nodes = network.get_nodes()
+#     distributions = network.get_distributions()
+#     for p_node_name, node_name in edges:
+#         print(f'{p_node_name} --> {node_name}')
+#         node = get_node_from_nodes(node_name,nodes)
+#         re.par =
+
+
+# def update_distributions_from_nodes(network: Network, redundance: set):
+#     evidences = network.get_evidences()
+#     distributions = network.get_distributions()
+#     domains =network.get_domains()
+#     updated_nodes = [node for node in network.get_nodes() if node.get_name() not in redundance]
+#     # nodes, domains , distributions, evidences TODO update
+#     for remove_name in redundance:
+#         distributions[remove_name]
+
 
 
 def read_file(formula_file):
@@ -296,7 +320,15 @@ def sort_nodes(nodes: list, evidences: dict) -> list:
             unfinished_nodes.insert(0, cur_node)
     return ordered_nodes
 
+
 def parse_to_network(formula_file_path: str, domain_file_path: str):
+    """
+
+    :param formula_file_path:
+    :param domain_file_path:
+    :return: None
+    easy to test
+    """
     unordered_nodes, distributions = parse_formula(
         read_file(formula_file_path))
     temp_nodes, domains = parse_domain(
@@ -306,7 +338,8 @@ def parse_to_network(formula_file_path: str, domain_file_path: str):
     nodes = sort_nodes(temp_nodes, evidences)
     return Network(nodes, distributions, evidences, domains)
 
-def check_redundancy(name_list: list, evidences: dict):
+
+def find_redundancy_network(name_list: list, evidences: dict):
     redunance_list = set()
     # print(name_list)
     # print(evidences)
@@ -327,6 +360,11 @@ if __name__ == "__main__":
     #
     network = parse_to_network(FORMULA_FILE,Domain_FILE)
     print(network)
+    network.set_edges_from_nodes()
+    print(network.get_edges())
+    # print(network)
+    # network.pre_computing()
+
     # print(world.get_distributions())
     # print(f'evidences: {world.get_evidences()}')
     # world.generate_bayesian_network()

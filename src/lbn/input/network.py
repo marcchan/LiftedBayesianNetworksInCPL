@@ -44,9 +44,10 @@ class Network(object):
                     for p_node in p_nodes:
                         edges.append(tuple([p_node, c_node]))
                         for key, value in self.distributions[c_node].items():
-                            if (len(re.findall(r'\|\|.*?'+p_node+'.*?\|\|', key)) != 0) & (tuple([p_node,c_node]) not in freq_edges):
-                                freq_edges.append((tuple([p_node,c_node])))
-            self.edges= edges
+                            if (len(re.findall(r'\|\|.*?' + p_node + '.*?\\|\\|', key))
+                                    != 0) & (tuple([p_node, c_node]) not in freq_edges):
+                                freq_edges.append(tuple([p_node, c_node]))
+            self.edges = edges
             self.freq_edges = freq_edges
             print(self.edges)
             print(f'freq_edges{self.freq_edges}')
@@ -86,7 +87,8 @@ class Network(object):
             if len(node.get_domain()) == 0:
                 statenames[node.get_name()] = [True, False]
             elif len(node.get_domain()) == 1:
-                statenames[node.get_name()] = list(range(node.get_variable_card()))
+                statenames[node.get_name()] = list(
+                    range(node.get_variable_card()))
             elif len(node.get_domain()) > 1:
                 # TODO: for multi parameter
                 print(f' TODO for multi parameter in set_statenames')
@@ -119,7 +121,7 @@ class Network(object):
             # may be has problem
             column: int = reduce(
                 lambda x,
-                       y: x * y,
+                y: x * y,
                 self.get_evidence_card_by_name(
                     node.get_name())) if self.get_evidence_list_by_name(
                 node.get_name()) is not None else 1
@@ -129,7 +131,7 @@ class Network(object):
                                                             self.evidences[node.get_name()],
                                                             self.distributions[node.get_name()],
                                                             self.get_state_names_by_name(node.get_name()),
-                                                            self.nodes).reshape(row,column)
+                                                            self.nodes).reshape(row, column)
         self.values = values
 
     def get_values_by_name(self, name: str):
@@ -143,12 +145,19 @@ class Network(object):
             self.set_statenames()
             self.set_values()
 
-    # def pre_computing(self):
-        # self.set_edges_from_nodes()
-        #     name_list = [node.get_name() for node in self.nodes]
-        #     redundance = find_redundancy_network(name_list, self.evidences)
-        #     # get_edges_no_freq(self)
-        #     # update_distributions_from_nodes(self, redundance)
+    def pre_computing(self):
+        # the following line should out of this function,
+        # currently only to test,
+        # should be in generate_baysian_network function
+        self.set_edges_from_nodes()
+        edges, freq_edges = self.edges, self.freq_edges
+        non_freq_edges = list(set(edges).difference(set(freq_edges)))
+        print(non_freq_edges)
+
+        # name_list = [node.get_name() for node in self.nodes]
+        # redundance = find_redundancy_network(name_list, self.evidences)
+        # get_edges_no_freq(self)
+        # update_distributions_from_nodes(self, redundance)
 
     def __str__(self):
         # check if generate_bayesian_network
@@ -175,7 +184,6 @@ class Network(object):
 #     # nodes, domains , distributions, evidences TODO update
 #     for remove_name in redundance:
 #         distributions[remove_name]
-
 
 
 def read_file(formula_file):
@@ -345,7 +353,7 @@ def find_redundancy_network(name_list: list, evidences: dict):
     # print(evidences)
     for node_name in name_list[::-1]:
         if len(evidences[node_name]) == 0:
-                redunance_list.add(node_name)
+            redunance_list.add(node_name)
         else:
             if node_name in redunance_list:
                 redunance_list.pop(node_name)
@@ -355,13 +363,14 @@ def find_redundancy_network(name_list: list, evidences: dict):
 
 
 if __name__ == "__main__":
-    FORMULA_FILE = '../../../examples/drives_air_fined/formula_v2'
-    Domain_FILE = '../../../examples/drives_air_fined/domain_v1'
+    FORMULA_FILE = '../../../examples/pre_computing_case/formula_v2'
+    Domain_FILE = '../../../examples/pre_computing_case/domain'
     #
-    network = parse_to_network(FORMULA_FILE,Domain_FILE)
+    network = parse_to_network(FORMULA_FILE, Domain_FILE)
     print(network)
-    network.set_edges_from_nodes()
-    print(network.get_edges())
+    # network.set_edges_from_nodes()
+
+    network.pre_computing()
     # print(network)
     # network.pre_computing()
 
@@ -381,4 +390,3 @@ if __name__ == "__main__":
     # Domain_FILE = '../../../examples/pre_computing_case/domain'
     # network_pre = Network(FORMULA_FILE, Domain_FILE)
     # network_pre.pre_computing()
-

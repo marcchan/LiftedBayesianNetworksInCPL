@@ -36,6 +36,9 @@ class Network(object):
     def get_freq_edges(self):
         return self.freq_edges if hasattr(self, 'freq_edges') else None
 
+    def get_non_freq_edges(self):
+        return list(set(self.edges).difference(set(self.freq_edges))) if (hasattr(self,'edges') and hasattr(self, 'freq_edges')) else None
+
     def set_edges_from_nodes(self):
         if len(self.nodes) != 0:
             edges, freq_edges = [], []
@@ -140,19 +143,20 @@ class Network(object):
     def generate_bayesian_network(self):
 
         # self.pre_computing()
+        self.set_edges_from_nodes()
         if self.nodes is not None:
             self.set_variable_card()
             self.set_statenames()
             self.set_values()
 
-    def pre_computing(self):
-        # the following line should out of this function,
-        # currently only to test,
-        # should be in generate_baysian_network function
-        self.set_edges_from_nodes()
-        edges, freq_edges = self.edges, self.freq_edges
-        non_freq_edges = list(set(edges).difference(set(freq_edges)))
-        print(non_freq_edges)
+    # def pre_computing(self):
+    #     # the following line should out of this function,
+    #     # currently only to test,
+    #     # should be in generate_baysian_network function
+    #     self.set_edges_from_nodes()
+    #     edges, freq_edges, non_freq_edges = self.edges, self.freq_edges, self.get_non_freq_edges()
+    #     print(non_freq_edges)
+
 
         # name_list = [node.get_name() for node in self.nodes]
         # redundance = find_redundancy_network(name_list, self.evidences)
@@ -164,26 +168,34 @@ class Network(object):
         # if not hasattr(self,'edges'):
         return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n'
 
-# def get_edges_no_freq(network: Network):
-#     if not hasattr(network,'edges'):
-#         network.set_edges_from_nodes()
-#     edges = network.get_edges()
-#     nodes = network.get_nodes()
-#     distributions = network.get_distributions()
-#     for p_node_name, node_name in edges:
-#         print(f'{p_node_name} --> {node_name}')
-#         node = get_node_from_nodes(node_name,nodes)
-#         re.par =
+# def set_non_freq_arrow_priority(network: Network):
+#     network.set_edges_from_nodes()
+#     edges, freq_edges, non_freq_edges = network.get_edges(), network.get_freq_edges(), network.get_non_freq_edges()
+#     evidences, distributions = network.get_evidences(),network.get_distributions()
+#     for (p_node_name,c_node_name) in non_freq_edges:
+#         # check p_node whether without evidence and c_node whether only has this evidence
+#         if network.get_evidence_list_by_name(p_node_name) == None:
+#             # calculate the probability of p_node and check if p_node only has 1 child
+#             if len(network.get_evidence_list_by_name(c_node_name)) == 1:
+#
+#
+#
+# def pre_computing(network: Network):
+#     network.set_edges_from_nodes()
+#     edges, freq_edges, non_freq_edges = network.get_edges(), network.get_freq_edges(), network.get_non_freq_edges()
+#     print(non_freq_edges)
 
 
-# def update_distributions_from_nodes(network: Network, redundance: set):
-#     evidences = network.get_evidences()
-#     distributions = network.get_distributions()
-#     domains =network.get_domains()
-#     updated_nodes = [node for node in network.get_nodes() if node.get_name() not in redundance]
-#     # nodes, domains , distributions, evidences TODO update
-#     for remove_name in redundance:
-#         distributions[remove_name]
+
+
+def update_distributions_from_nodes(network: Network, redundance: set):
+    evidences = network.get_evidences()
+    distributions = network.get_distributions()
+    domains =network.get_domains()
+    updated_nodes = [node for node in network.get_nodes() if node.get_name() not in redundance]
+    # nodes, domains , distributions, evidences TODO update
+    for remove_name in redundance:
+        distributions[remove_name]
 
 
 def read_file(formula_file):
@@ -370,7 +382,7 @@ if __name__ == "__main__":
     print(network)
     # network.set_edges_from_nodes()
 
-    network.pre_computing()
+    # pre_computing(network)
     # print(network)
     # network.pre_computing()
 

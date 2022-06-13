@@ -4,12 +4,12 @@ from pgmpy.models import BayesianNetwork
 
 from lbn.input.network import *
 
-# FORMULA_FILE = '../../examples/attend_grade_school/formula_v1'
+# FORMULA_FILE = '../../examples/attend_grade_school/formula_v2'
 # Domain_FILE = '../../examples/attend_grade_school/domain_v1'
-# FORMULA_FILE = '../../examples/drives_air_fined/formula_v1'
+# FORMULA_FILE = '../../examples/drives_air_fined/formula_v2'
 # Domain_FILE = '../../examples/drives_air_fined/domain_v1'
-FORMULA_FILE = '../../examples/pre_computing_case/formula_v2'
-Domain_FILE = '../../examples/pre_computing_case/domain'
+# FORMULA_FILE = '../../examples/pre_computing_case/temp_3'
+# Domain_FILE = '../../examples/pre_computing_case/domain'
 
 def generate_bn_model(file_path_formula: str, file_path_domain: str):
 
@@ -44,29 +44,30 @@ if __name__ == "__main__":
     BN_model = generate_bn_model(FORMULA_FILE,Domain_FILE)
     infer = VariableElimination(BN_model)
 
-    # Drives
-
-    # margin probability
-
+    # # Drives
+    #
+    # # margin probability
+    #
     # print(infer.query(["Fined"]))
+    # # a = infer.query(["Fined"]).get_value(Fined=True)
+    # # print(a)
+    #
+    #
+    # # conditional probability
+    # print(infer.query(["Fined"], evidence={"AirIsGood": True}))
+    #
+    # # joint probability
+    # print(infer.query(["Fined", "Drives", "AirIsGood"]))
 
-    # a = infer.query(["Fined"]).get_value(Fined=True)
-    # print(a)
 
-
-    # conditional probability
-    # print(infer.query(["Fined"], evidence={"Air_is_good": False}))
-
-    # joint probability
-    # print(infer.query(["Fined", "Drives", "Air_is_good"]))
-
-
-    # School
-    # print(infer.query(["attends"]))
-    # print(infer.query(["good_grade"]))
-    # print(infer.query(["school_good"]))
-    # conditional probability
-    # print(infer.query(["school_good"], evidence={"good_grade": 0,"attends":0}))
+    # # School
+    # print(infer.query(["Attends"]))
+    # print(infer.query(["GoodGrade"]))
+    # print(infer.query(["SchoolGood"]))
+    # # conditional probability
+    # print(infer.query(["SchoolGood"], evidence={"GoodGrade": 0,"Attends":0}))
+    # # joint probability
+    # print(infer.query(["Attends", "GoodGrade", "SchoolGood"]))
 
     # pre_computing
-    # print(infer.query(["attends"]))
+    # print(infer.query(["goodgrade"]))

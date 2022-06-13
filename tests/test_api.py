@@ -21,7 +21,7 @@ class TestNode(unittest.TestCase):
         Domain_FILE_school = '../examples/attend_grade_school/domain_v1'
         BN_model_1 = generate_bn_model(FORMULA_FILE_school, Domain_FILE_school)
         True_value_2 = VariableElimination(BN_model_1).query(
-            ['school_good']).get_value(school_good=True)
+            ['SchoolGood']).get_value(SchoolGood=True)
         print(True_value_2)
         assert_almost_equal(True_value_2, 0.7342, decimal=4)
         print(f'school runs')

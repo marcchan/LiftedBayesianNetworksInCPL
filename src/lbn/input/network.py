@@ -119,7 +119,9 @@ class Network(object):
             Fined row = 2, col = 5 * 2
         """
         values = {}
+        print('set valueing')
         for node in self.nodes:
+            print(f'current node is {node.get_name()}')
             row = self.get_variable_card_by_name(node.get_name())
             # may be has problem
             column: int = reduce(
@@ -128,13 +130,14 @@ class Network(object):
                 self.get_evidence_card_by_name(
                     node.get_name())) if self.get_evidence_list_by_name(
                 node.get_name()) is not None else 1
-            values[node.get_name()] = fill_data_into_values(node,
-                                                            row,
-                                                            column,
-                                                            self.evidences[node.get_name()],
-                                                            self.distributions[node.get_name()],
-                                                            self.get_state_names_by_name(node.get_name()),
-                                                            self.nodes).reshape(row, column)
+            temp_value = fill_data_into_values(node,
+                                  row,
+                                  column,
+                                  self.evidences[node.get_name()],
+                                  self.distributions[node.get_name()],
+                                  self.get_state_names_by_name(node.get_name()),
+                                  self.nodes)
+            values[node.get_name()] = temp_value.reshape(row, column)
         self.values = values
 
     def get_values_by_name(self, name: str):

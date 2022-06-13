@@ -241,6 +241,7 @@ def fill_data_into_values(
         distribution: dict,
         state_name: dict,
         nodes: list):
+    # todo need to check maybe use flag better
     if len(evidence) == 0:
         res_arr = []
         phi: float = float(distribution['self'])
@@ -271,20 +272,6 @@ def fill_data_into_values(
             return numpy.append(res_matrix, 1 - res_matrix, axis=0)
 
 
-# def check_only_with_frequence(node1: Node, nodes: list) -> bool:
-#     node_counter, freq_node_counter = 0, 0
-#     for node in nodes:
-#         if node1.get_name() != node.get_name():
-#             dist_keylist = node.get_distributions().keys()
-#             for dist_key in dist_keylist:
-#                 node_counter += dist_key.count(node1.get_name())
-#                 freq_node_counter += dist_key.count(f'||{node1.get_name()}')
-#
-#     return node_counter == freq_node_counter
-
-# maybe need new a class with FreqNode
-# def replace_node_to_freqnode(node, probability):
-#     return
 
 
 def setup_bino_dist(phi: float, domain: int) -> dict:

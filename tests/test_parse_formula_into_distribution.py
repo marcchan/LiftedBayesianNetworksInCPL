@@ -29,27 +29,27 @@ class TestNode(unittest.TestCase):
             '0.0 <= 0.5 ', str_expression_helper(
                 '||Drives(x) <= 0.5 ||_x', evi_value_dict={
                     'Drives': 0}, state_name={
-                    'Air_is_good': [
+                    'AirIsGood': [
                         True, False], 'Drives': [
                         0, 1, 2, 3, 4]}, nodes=nodes_daf))
         # fined
         self.assertEqual(
             ' not False and 0.5 >= 0.7 ', str_expression_helper(
-                '!Air_is_good & ||Drives(x) >= 0.7||_x ', {
-                    'Air_is_good': False, 'Drives': 2}, {
+                '!AirIsGood & ||Drives(x) >= 0.7||_x ', {
+                    'AirIsGood': False, 'Drives': 2}, {
                     'Fined': [
-                        True, False], 'Air_is_good': [
+                        True, False], 'AirIsGood': [
                         True, False], 'Drives': [
                             0, 1, 2, 3, 4]}, nodes=nodes_daf))
         # good_grade
 
         self.assertEqual(
             '0.0 >= 0.95 and 0.0 >= 0.30 ', str_expression_helper(
-                '||attends(x) >= 0.95||_x & ||good_grade(x) >= 0.30||_x ', {
-                    'attends': 0, 'good_grade': 0}, {
-                    'school_good': [
-                        True, False], 'attends': [
-                        0, 1, 2, 3, 4], 'good_grade': [
+                '||Attends(x) >= 0.95||_x & ||GoodGrade(x) >= 0.30||_x ', {
+                    'Attends': 0, 'GoodGrade': 0}, {
+                    'SchoolGood': [
+                        True, False], 'Attends': [
+                        0, 1, 2, 3, 4], 'GoodGrade': [
                             0, 1, 2, 3, 4]}, nodes=nodes_ags))
 
     def test_check_probability_from_distribution(self):

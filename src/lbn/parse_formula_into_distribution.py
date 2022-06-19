@@ -10,6 +10,8 @@ def get_node_from_nodes(variable: str, nodes: list) -> Node:
             return node
     print(f'nodes do not contain the node with the name: {variable}')
 
+# def get_evi_paras_from_nodes(node: Node, nodes: list):
+
 
 def get_lower_para_from_node(node: Node):
     para_list = list(node.get_para().keys())
@@ -167,7 +169,6 @@ def str_expression_helper(
     print('---')
     return condition
 
-
 def check_probability_from_distribution(
         card_list, distribution, p_names, state_name, nodes):
     evi_value_dict = {p_names[i]: state_name[p_names[i]][va]
@@ -202,7 +203,6 @@ def check_probability_from_distribution(
     if prob is None:
         return -1
 
-
 def recursive_data(
         card_list,
         res_matrix,
@@ -231,7 +231,6 @@ def recursive_data(
                 card_list, distribution, p_names, state_name, nodes)
     depth -= 1
     return res_matrix, depth
-
 
 def fill_data_into_values(
         node,
@@ -270,9 +269,6 @@ def fill_data_into_values(
             res_matrix, _ = recursive_data(
                 card_list, res_matrix, distribution, p_names, state_name, depth=0, nodes=nodes)
             return numpy.append(res_matrix, 1 - res_matrix, axis=0)
-
-
-
 
 def setup_bino_dist(phi: float, domain: int) -> dict:
     return {index: comb(domain, index) * pow(phi, index) *

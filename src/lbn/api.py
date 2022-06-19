@@ -8,8 +8,8 @@ from lbn.input.network import *
 # Domain_FILE = '../../examples/attend_grade_school/domain_v1'
 # FORMULA_FILE = '../../examples/drives_air_fined/formula_v2'
 # Domain_FILE = '../../examples/drives_air_fined/domain_v1'
-# FORMULA_FILE = '../../examples/pre_computing_case/temp_3'
-# Domain_FILE = '../../examples/pre_computing_case/domain'
+FORMULA_FILE = '../../examples/pre_computing_case/temp_3'
+Domain_FILE = '../../examples/pre_computing_case/domain'
 
 def generate_bn_model(file_path_formula: str, file_path_domain: str):
 
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     # print(infer.query(["Attends", "GoodGrade", "SchoolGood"]))
 
     # pre_computing
-    # print(infer.query(["goodgrade"]))
+    print(infer.query(["GoodGrade"]))

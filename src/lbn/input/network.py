@@ -137,6 +137,11 @@ class Network(object):
                                   self.distributions[node.get_name()],
                                   self.get_state_names_by_name(node.get_name()),
                                   self.nodes)
+            if temp_value is not None:
+                print(f'nodename: {node.get_name()} has the value of{temp_value.reshape(row, column)}')
+            else:
+                print(f'nodename: {node.get_name()} can not get the value')
+
             values[node.get_name()] = temp_value.reshape(row, column)
         self.values = values
 
@@ -151,7 +156,6 @@ class Network(object):
             self.set_variable_card()
             self.set_statenames()
             self.set_values()
-
     # def pre_computing(self):
     #     # the following line should out of this function,
     #     # currently only to test,
@@ -187,9 +191,6 @@ class Network(object):
 #     network.set_edges_from_nodes()
 #     edges, freq_edges, non_freq_edges = network.get_edges(), network.get_freq_edges(), network.get_non_freq_edges()
 #     print(non_freq_edges)
-
-
-
 
 def update_distributions_from_nodes(network: Network, redundance: set):
     evidences = network.get_evidences()

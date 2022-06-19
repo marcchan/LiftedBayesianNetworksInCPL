@@ -1,0 +1,6 @@
+GoodTeacher::{T: teacher}
+0.44
+
+GoodGrade::{X: student}
+||GoodTeacher(t) > 0.5||_t : 0.4
+||GoodTeacher(t) <= 0.5||_t : 0.2

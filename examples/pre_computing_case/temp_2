@@ -1,0 +1,20 @@
+GoodTeacher::{T: teacher}
+0.44
+
+Illness::{X: student}
+0.05
+
+Attends::{X: student}
+!Illness(x) & ||GoodTeacher(t) > 0.5 ||_t : 0.9
+!Illness(x) & ||GoodTeacher(t) <= 0.5 ||_t : 0.8
+Illness(x) : 0.1
+
+GoodGrade::{X: student}
+||GoodTeacher(t) > 0.5||_t : 0.4
+||GoodTeacher(t) <= 0.5||_t : 0.2
+
+GoodSchool::{}
+||Attends(x) >= 0.95||_x & ||GoodGrade(x) >= 0.30||_x : 0.95
+||Attends(x) < 0.95||_x & ||GoodGrade(x) >= 0.30||_x : 0.9
+||Attends(x) >= 0.95||_x & ||GoodGrade(x) < 0.30||_x : 0.8
+||Attends(x) < 0.95||_x & ||GoodGrade(x) < 0.30||_x : 0.3

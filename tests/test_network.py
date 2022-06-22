@@ -1,5 +1,5 @@
 import unittest
-from lbn.input.network import Network, parse_to_network, check_redundancy
+from lbn.network_helper import parse_to_network
 from numpy.ma.testutils import assert_almost_equal
 from pgmpy.factors.discrete import TabularCPD
 from lbn.api import generate_bn_model

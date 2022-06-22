@@ -1,7 +1,6 @@
 import unittest
 from lbn.parse_formula_into_distribution import *
-from lbn.input.network import parse_to_network,Network
-
+from lbn.network_helper import parse_to_network
 
 class TestNode(unittest.TestCase):
     def test_get_lower_para_fron_node(self):

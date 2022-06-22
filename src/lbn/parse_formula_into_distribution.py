@@ -1,6 +1,7 @@
 from scipy.special import comb
 import numpy
 import re
+from lbn.input.network import *
 from lbn.input.node import Node
 
 

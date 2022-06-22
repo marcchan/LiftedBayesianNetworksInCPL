@@ -2,21 +2,21 @@ from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from pgmpy.models import BayesianNetwork
 
-from lbn.input.network import *
+from lbn.network_helper import *
 
 # FORMULA_FILE = '../../examples/attend_grade_school/formula_v2'
 # Domain_FILE = '../../examples/attend_grade_school/domain_v1'
-# FORMULA_FILE = '../../examples/drives_air_fined/formula_v2'
-# Domain_FILE = '../../examples/drives_air_fined/domain_v1'
-FORMULA_FILE = '../../examples/pre_computing_case/temp_3'
-Domain_FILE = '../../examples/pre_computing_case/domain'
+FORMULA_FILE = '../../examples/drives_air_fined/formula_v2'
+Domain_FILE = '../../examples/drives_air_fined/domain_v1'
+# FORMULA_FILE = '../../examples/pre_computing_case/temp_3'
+# Domain_FILE = '../../examples/pre_computing_case/domain'
 
 def generate_bn_model(file_path_formula: str, file_path_domain: str):
 
     network = parse_to_network(file_path_formula, file_path_domain)
 
     # generate the complete Baysian network
-    network.generate_bayesian_network()
+    generate_bayesian_network(network)
     nodes = network.get_nodes()
 
     # setup bayesian network
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     # print(infer.query(["Attends", "GoodGrade", "SchoolGood"]))
 
     # pre_computing
-    print(infer.query(["GoodGrade"]))
+    # print(infer.query(["GoodGrade"]))

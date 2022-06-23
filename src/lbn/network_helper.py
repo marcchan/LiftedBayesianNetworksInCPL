@@ -3,16 +3,7 @@ import re
 from lbn.input.network import Network
 from lbn.input.node import Node
 from lbn.parse_formula_into_distribution import fill_data_into_values
-
-# def update_distributions_from_nodes(network: Network, redundance: set):
-#     evidences = network.get_evidences()
-#     distributions = network.get_distributions()
-#     domains =network.get_domains()
-#     updated_nodes = [node for node in network.get_nodes() if node.get_name() not in redundance]
-#     # nodes, domains , distributions, evidences TODO update
-#     for remove_name in redundance:
-#         distributions[remove_name]
-
+from lbn.pre_computing import pre_computing
 
 def read_file(formula_file):
     try:
@@ -175,20 +166,44 @@ def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
     return Network(nodes, distributions, evidences, domains)
 
 
-def find_redundancy_network(name_list: list, evidences: dict):
-    redunance_list = set()
-    # print(name_list)
-    # print(evidences)
-    for node_name in name_list[::-1]:
-        if len(evidences[node_name]) == 0:
-            redunance_list.add(node_name)
-        else:
-            if node_name in redunance_list:
-                redunance_list.pop(node_name)
-            redunance_list.union(evidences[node_name])
-    # print(redunance_list)
-    return redunance_list
 
+
+# def set_network_values(network):
+#     # TODO
+#     """
+#
+#     :return: None
+#     Values: 2D array
+#         Drives row = 5, col = 1
+#         Air_is_good row = 2, col = 5
+#         Fined row = 2, col = 5 * 2
+#     """
+#     values = {}
+#     print('set valueing')
+#     for node in network.get_nodes():
+#         print(f'current node is {node.get_name()}')
+#         row = network.get_variable_card_by_name(node.get_name())
+#         # maybe has problem
+#         column: int = reduce(
+#             lambda x,
+#                    y: x * y,
+#             network.get_evidence_card_by_name(
+#                 node.get_name())) if network.get_evidence_list_by_name(
+#             node.get_name()) is not None else 1
+#         temp_value = fill_data_into_values(node,
+#                                            row,
+#                                            column,
+#                                            network.get_evidences()[node.get_name()],
+#                                            network.get_distributions()[node.get_name()],
+#                                            network.get_state_names_by_name(node.get_name()),
+#                                            network.get_nodes())
+#         if temp_value is not None:
+#             print(f'nodename: {node.get_name()} has the value of{temp_value.reshape(row, column)}')
+#         else:
+#             print(f'nodename: {node.get_name()} can not get the value')
+#
+#         values[node.get_name()] = temp_value.reshape(row, column)
+#     network.set_values(values)
 
 def set_network_values(network):
     # TODO
@@ -201,11 +216,10 @@ def set_network_values(network):
         Fined row = 2, col = 5 * 2
     """
     values = {}
-    print('set valueing')
     for node in network.get_nodes():
         print(f'current node is {node.get_name()}')
         row = network.get_variable_card_by_name(node.get_name())
-        # may be has problem
+        # maybe has problem
         column: int = reduce(
             lambda x,
                    y: x * y,
@@ -267,26 +281,16 @@ def set_network_variable_card(network: Network):
 
 
 def generate_bayesian_network(network):
-    # self.pre_computing()
     set_network_edges(network)
+    # pre_computing(network)
+    # current need set_edges, if pre_computing is done, please remove this loc
     if network.get_nodes() is not None:
         set_network_variable_card(network)
         set_network_statenames(network)
         set_network_values(network)
 
-# def pre_computing(self):
-    #     # the following line should out of this function,
-    #     # currently only to test,
-    #     # should be in generate_baysian_network function
-    #     self.set_edges_from_nodes()
-    #     edges, freq_edges, non_freq_edges = self.edges, self.freq_edges, self.get_non_freq_edges()
-    #     print(non_freq_edges)
 
 
-        # name_list = [node.get_name() for node in self.nodes]
-        # redundance = find_redundancy_network(name_list, self.evidences)
-        # get_edges_no_freq(self)
-        # update_distributions_from_nodes(self, redundance)
 
 
 if __name__ == "__main__":
@@ -300,7 +304,6 @@ if __name__ == "__main__":
     print(network.get_edges())
 
     # pre_computing(network)
-
 
     # world.generate_bayesian_network()
     # nodes = world.get_nodes()

@@ -71,3 +71,4 @@ if __name__ == "__main__":
 
     # pre_computing
     # print(infer.query(["GoodGrade"]))
+    print(BN_model.get_independencies())

@@ -5,6 +5,7 @@ from lbn.input.node import Node
 from lbn.parse_formula_into_distribution import fill_data_into_values
 from lbn.pre_computing import pre_computing
 
+
 def read_file(formula_file):
     try:
         with open(formula_file, 'r') as f:
@@ -166,45 +167,6 @@ def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
     return Network(nodes, distributions, evidences, domains)
 
 
-
-
-# def set_network_values(network):
-#     # TODO
-#     """
-#
-#     :return: None
-#     Values: 2D array
-#         Drives row = 5, col = 1
-#         Air_is_good row = 2, col = 5
-#         Fined row = 2, col = 5 * 2
-#     """
-#     values = {}
-#     print('set valueing')
-#     for node in network.get_nodes():
-#         print(f'current node is {node.get_name()}')
-#         row = network.get_variable_card_by_name(node.get_name())
-#         # maybe has problem
-#         column: int = reduce(
-#             lambda x,
-#                    y: x * y,
-#             network.get_evidence_card_by_name(
-#                 node.get_name())) if network.get_evidence_list_by_name(
-#             node.get_name()) is not None else 1
-#         temp_value = fill_data_into_values(node,
-#                                            row,
-#                                            column,
-#                                            network.get_evidences()[node.get_name()],
-#                                            network.get_distributions()[node.get_name()],
-#                                            network.get_state_names_by_name(node.get_name()),
-#                                            network.get_nodes())
-#         if temp_value is not None:
-#             print(f'nodename: {node.get_name()} has the value of{temp_value.reshape(row, column)}')
-#         else:
-#             print(f'nodename: {node.get_name()} can not get the value')
-#
-#         values[node.get_name()] = temp_value.reshape(row, column)
-#     network.set_values(values)
-
 def set_network_values(network):
     # TODO
     """
@@ -288,9 +250,6 @@ def generate_bayesian_network(network):
         set_network_variable_card(network)
         set_network_statenames(network)
         set_network_values(network)
-
-
-
 
 
 if __name__ == "__main__":

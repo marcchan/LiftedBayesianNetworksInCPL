@@ -1,6 +1,7 @@
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from pgmpy.models import BayesianNetwork
+from main import generate_bayesian_network
 
 from lbn.network_helper import *
 
@@ -8,9 +9,15 @@ from lbn.network_helper import *
 # Domain_FILE = '../../examples/attend_grade_school/domain_v1'
 FORMULA_FILE = '../../examples/drives_air_fined/formula_v2'
 Domain_FILE = '../../examples/drives_air_fined/domain_v1'
+
+# FORMULA_FILE = '../../examples/drives_air_fined/test/formula_v2'
+# Domain_FILE = '../../examples/drives_air_fined/test/domain_v1'
+
 # FORMULA_FILE = '../../examples/pre_computing_case/temp_3'
 # Domain_FILE = '../../examples/pre_computing_case/domain'
 
+# FORMULA_FILE = '../../examples/test_two_network/formula'
+# Domain_FILE = '../../examples/test_two_network/domain'
 def generate_bn_model(file_path_formula: str, file_path_domain: str):
 
     network = parse_to_network(file_path_formula, file_path_domain)
@@ -18,7 +25,9 @@ def generate_bn_model(file_path_formula: str, file_path_domain: str):
     # generate the complete Baysian network
     generate_bayesian_network(network)
     nodes = network.get_nodes()
-
+    edges, freq_edges = network.get_edges(), network.get_freq_edges()
+    non_freq_edges = list(set(edges).difference(set(freq_edges)))
+    print(f'{non_freq_edges}---------')
     # setup bayesian network
     BN_model = BayesianNetwork(network.get_edges())
     for node in nodes:
@@ -36,28 +45,30 @@ def generate_bn_model(file_path_formula: str, file_path_domain: str):
             evidence_card,
             state_names)
         BN_model.add_cpds(cpd_node)
+        print(f'{variable} with variable_card:{variable_card}, evidence:{evidence},evi_card:{evidence_card}, state_names:{state_names}')
     return BN_model
 
 
 if __name__ == "__main__":
 
     BN_model = generate_bn_model(FORMULA_FILE,Domain_FILE)
+    # BN_model.check_model()
     infer = VariableElimination(BN_model)
 
     # # Drives
     #
     # # margin probability
     #
-    # print(infer.query(["Fined"]))
+    # print(infer.query(["H"]))
     # # a = infer.query(["Fined"]).get_value(Fined=True)
     # # print(a)
     #
     #
     # # conditional probability
-    # print(infer.query(["Fined"], evidence={"AirIsGood": True}))
+    print(infer.query(["Fined"], evidence={"AirIsGood": True}))
     #
     # # joint probability
-    # print(infer.query(["Fined", "Drives", "AirIsGood"]))
+    # print(infer.query(["Fined", "Drives", "AirIsGood","H"]))
 
 
     # # School

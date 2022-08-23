@@ -1,9 +1,6 @@
-from functools import reduce
 import re
 from lbn.input.network import Network
 from lbn.input.node import Node
-from lbn.parse_formula_into_distribution import fill_data_into_values
-from lbn.pre_computing import pre_computing
 
 
 def read_file(formula_file):
@@ -84,14 +81,11 @@ def parse_formula(formula: str):
                 changed_fm_list = changed_fm.split('\n')
                 for changed_fm_part in changed_fm_list:
                     if ':' not in changed_fm_part:
-                        # temp_dict['self'] = float(changed_fm_part)
                         temp_dict['self'] = changed_fm_part
                     else:
-                        # temp_dict[changed_fm_part[:changed_fm_part.index(':')]] = float(
-                        #     changed_fm_part[changed_fm_part.index(':') + 1:])
-                        temp_dict[changed_fm_part[:changed_fm_part.index(':')]] = \
-                            changed_fm_part[changed_fm_part.index(':') + 1:]
+                        temp_dict[str.strip(changed_fm_part[:changed_fm_part.index(':')],' ')] = str.strip(changed_fm_part[changed_fm_part.index(':') + 1:],' ')
                 distributions_dict[nodes[i].get_name()] = temp_dict
+                print(distributions_dict)
         return nodes, distributions_dict
 
 
@@ -151,7 +145,6 @@ def sort_nodes(nodes: list, evidences: dict) -> list:
 
 def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
     """
-
     :param formula_file_path:
     :param domain_file_path:
     :return: Network
@@ -164,44 +157,10 @@ def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
     evidences = set_evidences_from_distributions(
         temp_nodes, distributions)
     nodes = sort_nodes(temp_nodes, evidences)
-    return Network(nodes, distributions, evidences, domains)
-
-
-def set_network_values(network):
-    # TODO
-    """
-
-    :return: None
-    Values: 2D array
-        Drives row = 5, col = 1
-        Air_is_good row = 2, col = 5
-        Fined row = 2, col = 5 * 2
-    """
-    values = {}
-    for node in network.get_nodes():
-        print(f'current node is {node.get_name()}')
-        row = network.get_variable_card_by_name(node.get_name())
-        # maybe has problem
-        column: int = reduce(
-            lambda x,
-                   y: x * y,
-            network.get_evidence_card_by_name(
-                node.get_name())) if network.get_evidence_list_by_name(
-            node.get_name()) is not None else 1
-        temp_value = fill_data_into_values(node,
-                                           row,
-                                           column,
-                                           network.get_evidences()[node.get_name()],
-                                           network.get_distributions()[node.get_name()],
-                                           network.get_state_names_by_name(node.get_name()),
-                                           network.get_nodes())
-        if temp_value is not None:
-            print(f'nodename: {node.get_name()} has the value of{temp_value.reshape(row, column)}')
-        else:
-            print(f'nodename: {node.get_name()} can not get the value')
-
-        values[node.get_name()] = temp_value.reshape(row, column)
-    network.set_values(values)
+    network = Network(nodes, distributions, evidences, domains)
+    set_network_edges(network)
+    print(network)
+    return network
 
 
 def set_network_statenames(network):
@@ -242,39 +201,92 @@ def set_network_variable_card(network: Network):
     network.set_variable_card({node.get_name(): node.get_variable_card() for node in network.get_nodes()})
 
 
-def generate_bayesian_network(network):
-    set_network_edges(network)
-    # pre_computing(network)
-    # current need set_edges, if pre_computing is done, please remove this loc
-    if network.get_nodes() is not None:
-        set_network_variable_card(network)
-        set_network_statenames(network)
-        set_network_values(network)
+def get_lower_para_from_node(node: Node):
+    para_list = list(node.get_para().keys())
+    para_result, suffix_result = "", ""
+    for idx, value in enumerate(para_list):
+        para_result += "("
+        if idx == len(para_list) - 1:
+            para_result += value.lower() + ")"
+        else:
+            para_result += value.lower() + ","
+        suffix_result += "_" + value.lower()
+    return para_result, suffix_result
 
 
-if __name__ == "__main__":
-    FORMULA_FILE = '../../examples/pre_computing_case/formula_v2'
-    Domain_FILE = '../../examples/pre_computing_case/domain'
-    #
-    network = parse_to_network(FORMULA_FILE, Domain_FILE)
-    print(network)
+# def set_network_values(network):
+#     # TODO
+#     """
+#
+#     :return: None
+#     Values: 2D array
+#         Drives row = 5, col = 1
+#         Air_is_good row = 2, col = 5
+#         Fined row = 2, col = 5 * 2
+#     """
+#     values = {}
+#     for node in network.get_nodes():
+#         print(f'current node is {node.get_name()}')
+#         row = network.get_variable_card_by_name(node.get_name())
+#         # maybe has problem
+#         column: int = reduce(
+#             lambda x,
+#                    y: x * y,
+#             network.get_evidence_card_by_name(
+#                 node.get_name())) if network.get_evidence_list_by_name(
+#             node.get_name()) is not None else 1
+#         temp_value = fill_data_into_values(node,
+#                                            row,
+#                                            column,
+#                                            network.get_evidences()[node.get_name()],
+#                                            network.get_distributions()[node.get_name()],
+#                                            network.get_state_names_by_name(node.get_name()),
+#                                            network.get_nodes())
+#         if temp_value is not None:
+#             print(f'nodename: {node.get_name()} has the value of{temp_value.reshape(row, column)}')
+#         else:
+#             print(f'nodename: {node.get_name()} can not get the value')
+#
+#         values[node.get_name()] = temp_value.reshape(row, column)
+#     network.set_values(values)
 
-    set_network_edges(network)
-    print(network.get_edges())
 
-    # pre_computing(network)
-
-    # world.generate_bayesian_network()
-    # nodes = world.get_nodes()
-    # for n in nodes:
-    #     print((n.get_para().keys()))
-    # print(f'edges: {world.get_edges()}')
-    # print(f'variable_card: {world.get_variable_card()}')
-    # print(f'statenames: {world.get_statenames()}')
-
-    # regex_all = re.complie(r'\|\|.*?{variable}.*?\|\|(_[a-z]){0,}')
-
-    # FORMULA_FILE = '../../../examples/pre_computing_case/formula_v2'
-    # Domain_FILE = '../../../examples/pre_computing_case/domain'
-    # network_pre = Network(FORMULA_FILE, Domain_FILE)
-    # network_pre.pre_computing()
+# def generate_bayesian_network(network):
+#     # update_network = pre_computing(network)
+#     # current need set_edges, if pre_computing is done, please remove this loc
+#     if network.get_nodes() is not None:
+#         set_network_variable_card(network)
+#         set_network_statenames(network)
+#         set_network_values(network)
+#
+#
+# def pre_computing(network) :
+#     pre_computing_queue = check_necessary(network)
+#     temp_network = network
+#     if len(pre_computing_queue) == 0:
+#         print('It is not necessary to do pre-computing for this network!!')
+#     else:
+#         for pre_computing_edge in pre_computing_queue:
+#             temp_network = delete_node(temp_network, pre_computing_edge)
+#
+#     return
+#
+#
+# if __name__ == "__main__":
+#     FORMULA_FILE = '../../examples/pre_computing_case/formula_v2'
+#     Domain_FILE = '../../examples/pre_computing_case/domain'
+#     # FORMULA_FILE = '../../examples/drives_air_fined/formula_v2'
+#     # Domain_FILE = '../../examples/drives_air_fined/domain_v1'
+#     # FORMULA_FILE = '../../examples/test_two_network/formula'
+#     # Domain_FILE = '../../examples/test_two_network/domain'
+#     network = parse_to_network(FORMULA_FILE, Domain_FILE)
+#
+#     pre_computing(network)
+#
+#     # world.generate_bayesian_network()
+#     # nodes = world.get_nodes()
+#     # for n in nodes:
+#     #     print((n.get_para().keys()))
+#     # print(f'edges: {world.get_edges()}')
+#     # print(f'variable_card: {world.get_variable_card()}')
+#     # print(f'statenames: {world.get_statenames()}')

@@ -1,30 +1,16 @@
 from scipy.special import comb
 import numpy
 import re
-from lbn.input.network import *
 from lbn.input.node import Node
+from network_helper import get_lower_para_from_node
 
 
 def get_node_from_nodes(variable: str, nodes: list) -> Node:
+    # todo delete refactor by get_node_from_nodes()...
     for node in nodes:
         if node.get_name() == variable:
             return node
     print(f'nodes do not contain the node with the name: {variable}')
-
-# def get_evi_paras_from_nodes(node: Node, nodes: list):
-
-
-def get_lower_para_from_node(node: Node):
-    para_list = list(node.get_para().keys())
-    para_result, suffix_result = "", ""
-    for idx, value in enumerate(para_list):
-        para_result += "("
-        if idx == len(para_list) - 1:
-            para_result += value.lower() + ")"
-        else:
-            para_result += value.lower() + ","
-        suffix_result += "_" + value.lower()
-    return para_result, suffix_result
 
 
 def str_expression_helper(

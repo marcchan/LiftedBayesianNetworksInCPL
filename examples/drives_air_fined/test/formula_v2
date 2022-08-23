@@ -1,0 +1,15 @@
+Drives::{ X : driver }
+0.5
+
+AirIsGood::{}
+||Drives(x) <= 0.5||_x : 0.8
+||Drives(x) > 0.5||_x : 0.6
+
+Fined::{}
+AirIsGood : 0.1
+!AirIsGood & ||Drives(x) >= 0.7||_x : 0.8
+!AirIsGood & ||Drives(x) < 0.7||_x : 0.3
+
+H::{}
+Fined: 0.3
+!Fined : 0.4

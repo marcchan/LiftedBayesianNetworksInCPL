@@ -52,7 +52,13 @@ print(DAF_model.check_model())
 print(f'Network with edges: {DAF_model.edges()}')
 
 infer = VariableElimination(DAF_model)
-print(infer.query(["Fined"]))
+# print(infer.query(["Fined"]))
+print(infer.query(["Fined"], evidence={'Drives': 0}))
+print(infer.query(["Fined"], evidence={'Drives': 1}))
+print(infer.query(["Fined"], evidence={'Drives': 2}))
+print(infer.query(["Fined"], evidence={'Drives': 3}))
+print(infer.query(["Fined"], evidence={'Drives': 4}))
+
 # print(
 #     f'P( Fined | Air_is_good = False, Drives = 0): \n{infer.query(["Fined"], evidence={"Air_is_good": False, "Drives": 0})} \n')
 # print(f'----------\n Joint Probability: P(Fined, Air_is_good,Drives): \n{infer.query(["Fined","Drives","Air_is_good"])}')

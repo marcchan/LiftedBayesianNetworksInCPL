@@ -1,26 +1,24 @@
-qualified::{T: teacher}
-0.4
-todo remove
+Qualified::{T: teacher}
+self : 0.4
 
-good_teacher::{T: teacher}
-qualified(t): 0.7
-!qualified(t): 0.4
+GoodTeacher::{T: teacher}
+Qualified(t) : 0.7
+!Qualified(t) : 0.4
 
-illness:: {X: student}
-0.05
-todo remove
+Illness::{S: student}
+self : 0.05
 
-attends::{X: student}
-!illness(x) & ||good_teacher(t) > 0.5 ||_t : 0.9
-!illness(x) & ||good_teacher(t) <= 0.5 ||_t : 0.8
-illness(x) :0.1
+Attends::{S: student}
+!Illness(s) & ||GoodTeacher(t)||_t > 0.5 : 0.9
+!Illness(s) & ||GoodTeacher(t)||_t <= 0.5 : 0.8
+Illness(s) : 0.1
 
-good_grade::{X: student}
-||good_teacher(t) > 0.5||_t : 0.4
-||good_teacher(t) <= 0.5||_t : 0.2
+GoodGrade::{S: student}
+||GoodTeacher(t)||_t > 0.5 : 0.4
+||GoodTeacher(t)||_t <= 0.5 : 0.2
 
-good_school::{}
-||attends(x) >= 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.95
-||attends(x) < 0.95||_x & ||good_grade(x) >= 0.30||_x : 0.9
-||attends(x) >= 0.95||_x & ||good_grade(x) < 0.30||_x : 0.8
-||attends(x) < 0.95||_x & ||good_grade(x) < 0.30||_x : 0.3
+GoodSchool::{}
+||Attends(s)||_s >= 0.95 & ||GoodGrade(s)||_s >= 0.30 : 0.95
+||Attends(s)||_s < 0.95 & ||GoodGrade(s)||_s >= 0.30 : 0.9
+||Attends(s)||_s >= 0.95 & ||GoodGrade(s)||_s < 0.30 : 0.8
+||Attends(s)||_s < 0.95 & ||GoodGrade(s)||_s < 0.30 : 0.3

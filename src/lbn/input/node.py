@@ -7,9 +7,6 @@ class Node(object):
     def get_name(self):
         return self.name
 
-    # def get_type(self):
-        # return self.type
-
     def get_domain(self):
         return self.domain
 
@@ -18,9 +15,6 @@ class Node(object):
 
     def set_name(self, name):
         self.name = name
-
-    # def set_type(self, type):
-    #     self.type = type
 
     def set_domain(self, domain):
         self.domain = domain
@@ -59,3 +53,20 @@ class Node(object):
                 print(f'TODO with case of multi parameter in function get_variable_card in Object Node')
                 return 0
             # return reduce((lambda x, y: x * y), values)
+
+    def set_probability(self, prob: float):
+        self.probability = prob
+
+    def get_lower_para_from_node(self):
+        para_list = list(self.get_para().keys())
+        para_result, suffix_result = "", ""
+        for idx, value in enumerate(para_list):
+            para_result += "("
+            if idx == len(para_list) - 1:
+                para_result += value.lower() + ")"
+            else:
+                para_result += value.lower() + ","
+            suffix_result += "_" + value.lower()
+        return para_result, suffix_result
+
+

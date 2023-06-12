@@ -23,6 +23,12 @@ class Network(object):
     def get_evidences(self):
         return self.evidences
 
+    def set_evidences(self, evidences: dict):
+        self.evidences = evidences
+
+    def set_distributions(self, distributions: dict):
+        self.distributions = distributions
+
     def get_distributions(self):
         return self.distributions
 

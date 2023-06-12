@@ -1,0 +1,11 @@
+Drive::{ X : driver }
+self : 0.5
+
+AirIsGood::{}
+||Drive(x)||_x <= 0.5 : 0.8
+||Drive(x)||_x > 0.5 : 0.6
+
+CityRatingDrop::{}
+AirIsGood : 0.1
+!AirIsGood & ||Drive(x)||_x < 0.7 : 0.3
+!AirIsGood & ||Drive(x)||_x >= 0.7 : 0.8

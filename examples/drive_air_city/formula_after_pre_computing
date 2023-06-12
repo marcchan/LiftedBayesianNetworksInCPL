@@ -1,0 +1,10 @@
+Drive::{ X : driver }
+self : 0.5
+
+CityRatingDrop::{}
+||Drive(x)||_x <= 0.5 & ||Drive(x)||_x < 0.7 : 0.14
+||Drive(x)||_x > 0.5 & ||Drive(x)||_x < 0.7: 0.18
+||Drive(x)||_x <= 0.5 & ||Drive(x)||_x == 0.7: 0.24
+||Drive(x)||_x > 0.5 & ||Drive(x)||_x == 0.7: 0.38
+||Drive(x)||_x <= 0.5 & ||Drive(x)||_x > 0.7: 0.24
+||Drive(x)||_x > 0.5 & ||Drive(x)||_x > 0.7: 0.38

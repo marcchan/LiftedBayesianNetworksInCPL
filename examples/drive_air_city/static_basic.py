@@ -58,8 +58,6 @@ cpd_a = TabularCPD(variable='Air_is_good',
                    state_names={'Air_is_good': [True, False], 'Drives_x1': [True, False],'Drives_x2': [True, False],'Drives_x3': [True, False],'Drives_x4': [True, False] })
 
 
-
-
 # # The representation of CPD in pgmpy is a bit different than the CPD shown in the above picture. In pgmpy the colums
 # # are the evidences and rows are the states of the variable. So the grade CPD is represented like this:
 # #
@@ -102,9 +100,9 @@ print(DAF_model.to_junction_tree())
 print(f'Network with edges: {DAF_model.edges()}')
 infer = VariableElimination(DAF_model)
 
-print(infer.query(['Air_is_good']))
+# print(infer.query(['Air_is_good']))
 
-# print(infer.query(['Air_is_good','Drives_x1','Drives_x2','Drives_x3','Drives_x4']))
+print(infer.query(['Air_is_good','Drives_x1','Drives_x2','Drives_x3','Drives_x4']))
 # import networkx as nx
 # import matplotlib.pyplot as plt
 # nx.draw(

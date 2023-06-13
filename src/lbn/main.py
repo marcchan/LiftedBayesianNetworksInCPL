@@ -129,10 +129,10 @@ def generate_bayesian_network(network):
 
 if __name__ == "__main__":
 
-    # FORMULA_FILE = '../../examples/drive_air_city/formula'
-    # DOMAIN_FILE = '../../examples/drive_air_city/domain'
-    FORMULA_FILE = '../../examples/pre_computing_case/formula'
-    DOMAIN_FILE = '../../examples/pre_computing_case/domain'
+    FORMULA_FILE = '../../examples/drive_air_city/formula'
+    DOMAIN_FILE = '../../examples/drive_air_city/domain'
+    # FORMULA_FILE = '../../examples/pre_computing_case/formula'
+    # DOMAIN_FILE = '../../examples/pre_computing_case/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_3_P_2/formula'
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     # BN_model = generate_bayesian_network(network)
     # print(BN_model.check_model())
     # infer = VariableElimination(BN_model)
-    # print(infer.query(["Fined"]))
+    # print(infer.query(["CityRatingDrop"]))
 
     # text1 = ["||Drives(x)||_x >= 0.4 & ||Drives(x)||_x > 0.5 ", "AirIsGood & ||Drives(x)||_x >= 0.4",
     #          "!AirIsGood & ||Drive||_x == 0.4", "||Drives(x)||_x = 1"]

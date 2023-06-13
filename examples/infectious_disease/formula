@@ -2,11 +2,11 @@ IsInfectious::{P: person}
 self : 0.1
 
 IsDiagnosed::{P: person}
-IsInfectious(p): 0.2
-!IsInfectious(p): 0.01
+IsInfectious(p) : 0.2
+!IsInfectious(p) : 0.01
 
 Attends::{P: person, W: workplace}
-0.5
+self : 0.5
 
 IsShutDown::{W: workplace}
 ||IsDiagnosed(p) & Attends(p,w)||_p > 0 : 1

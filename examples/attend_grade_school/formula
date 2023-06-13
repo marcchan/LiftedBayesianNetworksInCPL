@@ -1,11 +1,11 @@
 Attends::{X: student}
-0.9
+self : 0.9
 
 GoodGrade::{X: student}
-0.3
+self : 0.3
 
 SchoolGood::{}
-||Attends(x)||_x >= 0.95& ||GoodGrade(x)||_x >= 0.30 : 0.95
+||Attends(x)||_x >= 0.95 & ||GoodGrade(x)||_x >= 0.30 : 0.95
 ||Attends(x)||_x < 0.95 & ||GoodGrade(x)||_x >= 0.30 : 0.9
 ||Attends(x)||_x >= 0.95 & ||GoodGrade(x)||_x < 0.30 : 0.8
 ||Attends(x)||_x < 0.95 & ||GoodGrade(x)||_x < 0.30 : 0.3

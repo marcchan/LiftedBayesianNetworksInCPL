@@ -291,8 +291,8 @@ def eval_dict_value(formula_dict: dict, d: dict, nodes, parent_name):
 if __name__ == "__main__":
     FORMULA_FILE = '../../examples/drive_air_city/formula'
     DOMAIN_FILE = '../../examples/drive_air_city/domain'
-    # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/formula'
-    # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/domain'
+    # FORMULA_FILE = '../../examples/pre_computing_case/test_case/case2/formula'
+    # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/Case2/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_3_P_2/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/C_3_P_2/domain'
     # FORMULA_FILE = '../../examples/infectious_disease/formula'

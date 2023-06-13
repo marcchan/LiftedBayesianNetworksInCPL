@@ -1,0 +1,11 @@
+A::{X: student}
+self : 0.7
+
+B::{Y: teacher}
+self : 0.3
+
+C::{X: student, Y: teacher}
+A(x)& B(y) : 0.95
+A(x) & !B(y) : 0.9
+!A(x) & B(y): 0.8
+!A(x) & !B(y): 0.3

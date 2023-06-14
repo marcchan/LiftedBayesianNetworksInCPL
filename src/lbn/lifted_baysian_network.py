@@ -1,9 +1,16 @@
 import re
 from itertools import product
-
 from lbn.input.network import Network
 from lbn.input.node import Node
 from lbn.network_helper import parse_to_network
+
+# class LiftedNode(object):
+#     def __init__(self, node: Node, flag):
+#         self.abstract_node = node
+#         self.lifted_flag = flag
+#
+#     #
+
 
 
 class LiftedBaysianNetwork(object):
@@ -11,17 +18,142 @@ class LiftedBaysianNetwork(object):
         self.abstract_network = network
         self.lifted_flag = flag
 
-
     def get_lifted_nodes(self):
         if self.lifted_flag:
             return check_lifted_nodes(self.abstract_network)
 
     def build_LBN(self):
         network = self.abstract_network
+        # node_topo_dict = {'IsInfectious' : ['IsInfctious_p1', 'IsInfctious_p2', ...,'IsInfctious_p4'  ],
+        #  'IsDiagnosed' : ['IsDiagnosed_p1', ..., 'IsDiagnosed_pn'],
+        node_topo_dict = self.get_node_topo_dict()
+        print(node_topo_dict)
+        # evi_topo_dict =
         for node in network.get_nodes():
-            if node.get_name() in self.get_lifted_nodes():
-                    pass
-                    # todo
+            pass
+        #     # lifted_node = LiftedNode()
+        #     if self.lifted_flag:
+        #         if node.get_name() in self.get_lifted_nodes():
+        #             pass
+        #     else:
+        #         generate_n_nodenames_as_list(node)
+
+            # node_topo_dict[node.get_name()] = generate_n_nodenames_as_list(node)
+
+
+            #  在没有lifting node的情况下， 所有variable = 'IsInfctious_p1'，...
+            # variable_card always 2
+            # evidence = [' p1, p2, pn']
+            # evidence_card
+            # state_names = {variable: [True, False]}
+            #value 比较难， 需要通过distribution来
+
+            # if node is root node
+
+
+    def get_node_topo_dict(self):
+        # node_topo_dict = {'IsInfectious' : ['IsInfctious_p1', ...,'IsInfctious_p4'  ],
+        #  'IsDiagnosed' : ['IsDiagnosed_p1', ..., 'IsDiagnosed_pn'],
+        node_topo_dict = {}
+        for node in self.abstract_network.get_nodes():
+            node_topo_dict[node.get_name()] = generate_n_nodenames_as_list(node)
+        return node_topo_dict
+
+    def get_evi_topo_dict(self):
+
+        # evi_topo_dict = {
+        # 'IsInfectious': {'IsInfectious_p1': set(),...,'IsInfectious_pn': set() }
+        # 'IsDiagnosed': {'IsDiagnosed_p1':{'IsInfectious_p1'},...,'IsInfectious_pn': {'IsInfectious_pn'} }
+        # 'Attends': {'Attends_p1_w1': set(), 'Attends_p1_w2': set(), 'Attends_pn_wm': set()}
+        #  'IsShutDown': {'IsShutDown_w1': {'IsDiagnosed_p1',..., 'IsDiagnosed_pn','Attends_p1_w1',..., 'Attends_pn_w1' },
+        #                 'IsShutDown_w2': {'IsDiagnosed_p1', ..., 'IsDiagnosed_pn', 'Attends_p1_w2', ..., 'Attends_pn_w2'}
+        #  }
+        # }
+        network = self.abstract_network
+        node_topo_dict = self.get_node_topo_dict()
+        evi_topo_dict = {}
+        evidences = network.get_evidences()
+        nodes = network.get_nodes()
+        edges = network.get_edges()
+        for node in nodes:
+            evi_topo = {}
+            node_topo = node_topo_dict[node.get_name()]
+            for n in node_topo:
+                # root node
+                if not evidences[node.get_name()]:
+                    evi_topo[n] = set()
+                else:
+                    # non-lifted-edges which 1 to 1 for domain n, i.e.: IsInfectious_p1 -> IsDiagnosed_p1
+                    if len(evidences[node.get_name()]) == 1:
+                        for evi_name in evidences[node.get_name()]:
+                            evi_node = network.get_node_from_name(evi_name)
+                            if evi_node.get_domain() == node.get_domain():
+                                temp_name = n
+                                evi_topo[n] = str.replace(temp_name,node.get_name(),evi_node.get_name())
+                    else:
+                        # multi evidences todo
+                        for evi_name in evidences[node.get_name()]:
+                            evi_node = network.get_node_from_name(evi_name)
+
+            evi_topo_dict[node.get_name()] = evi_topo
+        print(evi_topo_dict)
+
+
+    def get_node_value_dict(self, node):
+        network = self.abstract_network
+        node_distribution = network.get_distributions()[node.get_name()]
+        if network.get_evidences()[node.get_name()]:
+            probability = float(network.get_distributions()[node.get_name()]['self'])
+            value_dict = [[probability, 1 - probability]]
+        if len(node.get_domain()):
+            pass
+# def set_lifted_network_variable_card(lbn: LiftedBaysianNetwork):
+#     pass
+#
+# def set_Lifted_network_statenames(LBN: LiftedBaysianNetwork):
+#     # for any other case with multi parameter need to add case
+#     statenames = {}
+#     for node in network.get_nodes():
+#         if len(node.get_domain()) == 0:
+#             statenames[node.get_name()] = [True, False]
+#         elif len(node.get_domain()) == 1:
+#             statenames[node.get_name()] = list(
+#                 range(node.get_variable_card()))
+#         elif len(node.get_domain()) > 1:
+#             # TODO: for multi parameter
+#             print(f' TODO for multi parameter in set_statenames')
+#     print(f'statename:{statenames}')
+#     network.set_statenames(statenames)
+#
+#
+# def set_lifted_network_edges(network):
+#     if len(network.get_nodes()) != 0:
+#         edges, freq_edges = [], []
+#         for c_node, p_nodes in network.get_evidences().items():
+#             if len(p_nodes) != 0:
+#                 for p_node in p_nodes:
+#                     edges.append(tuple([p_node, c_node]))
+#                     for key, value in network.get_distributions()[
+#                         c_node].items():
+#                         if (len(re.findall(r'\|\|.*?' + p_node + '.*?\\|\\|', key))
+#                             != 0) & (tuple([p_node, c_node]) not in freq_edges):
+#                             freq_edges.append(tuple([p_node, c_node]))
+#         network.set_edges(edges)
+#         network.set_freq_edges(freq_edges)
+#         # print(network.get_edges())
+#         # print(f'freq_edges{network.get_freq_edges()}')
+#     else:
+#         print('have not inited nodes in set edges')
+
+
+# def set_lifted_network_variable_card(network: Network):
+#     network.set_variable_card(
+#         {node.get_name(): node.get_variable_card() for node in network.get_nodes()})
+
+
+
+
+
 
 
 # IsDiagnosed
@@ -46,6 +178,8 @@ class LiftedBaysianNetwork(object):
 # IsShutDown{W}
 # for w
 #     w1
+
+
 
 def check_lifted_nodes(network: Network):
     # return the list of nodes which could be lifted.
@@ -74,49 +208,23 @@ def check_lifted_nodes(network: Network):
     return lifted_nodes
 
 
-
-
-def check_nodes_with_domain(network: Network, lifted_flag):
-    pending_node_list = []
-    distributions = network.get_distributions()
-    evidences = network.get_evidences()
-    if not lifted_flag:
-        pending_node_list = network.get_nodes()
-    else:
-        # todo 可以不用
-        pass
-    lifted_node_list = []
-    map_dict = {}
-    new_evidences = {}
-    new_distributions = {}
-    for node in pending_node_list:
-        map_dict[node.get_name()] = generate_n_nodes(node)
-        print([n.get_name() for n in generate_n_nodes(node)])
-        lifted_node_list.extend(generate_n_nodes(node))
-    # for node in pending_node_list:
-    #     if not evidences[node.get_name()]:
-    #         for l_n in map_dict[node.get_name()]:
-    #             new_distributions[l_n.get_name()] = distributions[node.get_name()]
-    #             evidences[l_n.get_name()] = set()
-    #     else:
-    #         for
-
-
-def generate_n_nodes(node: Node) -> list:
+def generate_n_nodenames_as_list(node: Node) -> list:
     # From Node to LiftedNode which we need to release domain into every node
     # example node : name: Qualified, Domain:{'T': '4'}             -> Qualified[t~1], ... Qualified[t~4]
     #                name: GoodSchool, Domain:{}'                   -> GoodSchool
     #                name: Something, Domain: {'T': '4', 'S': '3'}  -> Something[t~1,s~1], ... Something[t~4,s~3]
-    lifted_nodes = []
+
+    normal_node_list = []
     domain = node.get_domain()
     for combination in product(*[range(int(value)) for value in domain.values()]):
+
         result_dict = {key: combination[i] + 1 for i, key in enumerate(domain.keys())}
-        # 有待重新定义
         kv_pair = ''.join('_{}{}'.format(str.lower(key), value) for key, value in result_dict.items())
+
         # consider the situation which node without para, as Air_Is_Good and Fined in DAF graph
         name = f'{node.get_name()}' if kv_pair == '' else f'{node.get_name()}{kv_pair}'
-        # lifted_nodes.append(NormalNode(name, para={}, domain={},prototype=node))
-    return lifted_nodes
+        normal_node_list.append(name)
+    return normal_node_list
 
 
 
@@ -129,18 +237,20 @@ if __name__ == "__main__":
     # FORMULA_FILE = '../../examples/good_teacher/formula'
     # DOMAIN_FILE = '../../examples/good_teacher/domain'
 
-    # FORMULA_FILE = '../../examples/drive_air_city/formula'
-    # DOMAIN_FILE = '../../examples/drive_air_city/domain'
+    FORMULA_FILE = '../../examples/drive_air_city/formula'
+    DOMAIN_FILE = '../../examples/drive_air_city/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_3_P_2/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/C_3_P_2/domain'
-    FORMULA_FILE = '../../examples/attend_grade_school/formula'
-    DOMAIN_FILE = '../../examples/attend_grade_school/domain'
+    # FORMULA_FILE = '../../examples/attend_grade_school/formula'
+    # DOMAIN_FILE = '../../examples/attend_grade_school/domain'
 
     network = parse_to_network(FORMULA_FILE, DOMAIN_FILE)
-    # lifted_flag = True
-    # lbn = LiftedBaysianNetwork(network,lifted_flag)
-    print(check_lifted_nodes(network))
+    lifted_flag = False
+    lbn = LiftedBaysianNetwork(network,lifted_flag)
+    print(lbn.get_evi_topo_dict())
+    # lbn.build_LBN()
+    # print(check_lifted_nodes(network))

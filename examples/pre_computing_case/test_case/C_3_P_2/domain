@@ -1,6 +1,4 @@
-student: 10
-teacher: 10
-chairman: 2
-newer: 8
-manager: 3
-something: 12
+x: 10
+y: 10
+z: 8
+m: 3

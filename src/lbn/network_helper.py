@@ -164,6 +164,7 @@ def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
         temp_nodes, distributions)
     nodes = sort_nodes(temp_nodes, evidences)
     network = Network(nodes, distributions, evidences, domains)
+    set_network_edges(network)
     print(network)
     return network
 

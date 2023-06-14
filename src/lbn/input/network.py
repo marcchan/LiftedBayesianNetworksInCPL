@@ -75,7 +75,10 @@ class Network(object):
         return self.values[name]
 
     def __str__(self):
-        return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n '
+        if self.edges:
+            return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n  edges:{self.edges}\n  lifted-edges:{self.freq_edges}\n------\n '
+        else:
+            return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n '
 
     def set_values(self, values):
         self.values = values

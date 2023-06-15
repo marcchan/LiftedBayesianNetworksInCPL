@@ -9,5 +9,5 @@ Attends::{P: person, W: workplace}
 self : 0.5
 
 IsShutDown::{W: workplace}
-||IsDiagnosed(p) & Attends(p,w)||_p > 0 : 1
-||IsDiagnosed(p) & Attends(p,w)||_p <= 0 : 0
+||IsDiagnosed(p) AND Attends(p,w)||_p > 0 : 1
+||IsDiagnosed(p) AND Attends(p,w)||_p <= 0 : 0

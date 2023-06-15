@@ -1,10 +1,9 @@
 Drives::{ D : driver }
-{p1,p2,p3,p4,p5} : 1
-{p6,p7,p8,p9,p10} : 0
+self : 0.5
 
 Live::{ D : driver, C: city }
-{} :
+self : 0.3
 
 AirIsGood::{ C : city }
-||Drives(d) | Live(d,c)||_d  <= 0.5 : 0.8
-||Drives(d) | Live(d,c)||_d > 0.5 : 0.6
+||Drives(d) AND Live(d,c)||_d  <= 0.5 : 0.8
+||Drives(d) AND Live(d,c)||_d > 0.5 : 0.6

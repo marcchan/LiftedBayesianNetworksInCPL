@@ -1,4 +1,6 @@
 # from lbn.parse_formula_into_distribution import *
+from lbn.input.node import Node
+
 
 class Network(object):
 
@@ -108,7 +110,7 @@ class Network(object):
                     reverse_evidences[parent].add(child)
         return reverse_evidences
 
-    def get_node_from_name(self, nodename):
+    def get_node_from_name(self, nodename) -> Node:
         for node in self.nodes:
             if node.get_name() == nodename:
                 return node

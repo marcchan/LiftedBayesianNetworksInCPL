@@ -61,7 +61,7 @@ cpd_gs = TabularCPD(
                             'Fined': [
                                 True, False], 'Air_is_good': [
                                     True, False], 'Drives': ['||D|| = 0', '1','2','3','4']})
-BN_model.add_cpds(cpd_gt, cpd_gg,cpd_a)
+BN_model.add_cpds(cpd_gt, cpd_gg)
 print(BN_model.check_model())
 print(f'Network with edges: {BN_model.edges()}')
 

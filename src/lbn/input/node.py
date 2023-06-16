@@ -61,7 +61,8 @@ class Node(object):
         para_list = list(self.get_para().keys())
         para_result, suffix_result = "", ""
         for idx, value in enumerate(para_list):
-            para_result += "("
+            if para_result =="":
+                para_result += "("
             if idx == len(para_list) - 1:
                 para_result += value.lower() + ")"
             else:

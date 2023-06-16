@@ -152,8 +152,8 @@ if __name__ == "__main__":
 
     BN_model = generate_bayesian_network(network)
     print(BN_model.check_model())
-    # infer = VariableElimination(BN_model)
-    # print(infer.query(["CityRatingDrop"]))
+    infer = VariableElimination(BN_model)
+    print(infer.query(["CityRatingDrop"]))
 
     # text1 = ["||Drives(x)||_x >= 0.4 & ||Drives(x)||_x > 0.5 ", "AirIsGood & ||Drives(x)||_x >= 0.4",
     #          "!AirIsGood & ||Drive||_x == 0.4", "||Drives(x)||_x = 1"]

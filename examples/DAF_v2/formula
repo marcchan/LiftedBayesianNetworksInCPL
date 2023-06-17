@@ -2,8 +2,8 @@ Drives::{ D : driver }
 self : 0.5
 
 Live::{ D : driver, C: city }
-self : 0.2
+self : 0.4
 
 AirIsGood::{ C : city }
-||Drives(d) | Live(d,c)||_d  <= 0.5 : 0.8
+||Drives(d) | Live(d,c)||_d <= 0.5 : 0.8
 ||Drives(d) | Live(d,c)||_d > 0.5 : 0.6

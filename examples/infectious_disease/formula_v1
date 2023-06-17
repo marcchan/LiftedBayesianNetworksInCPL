@@ -2,8 +2,8 @@ IsInfectious::{P: person}
 self : 0.1
 
 IsDiagnosed::{P: person}
-IsInfectious(p) : 0.2
-!IsInfectious(p) : 0.01
+IsInfectious(p) : 0.6
+!IsInfectious(p) : 0.2
 
 Attends::{P: person, W: workplace}
 self : 0.5

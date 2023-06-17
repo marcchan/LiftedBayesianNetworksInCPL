@@ -3,7 +3,8 @@ from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
 from pgmpy.models import BayesianNetwork
 import re
-
+import datetime
+import time
 from lbn.parse_formula_into_distribution import fill_data_into_values, fill_data_into_values_two
 from network_helper import set_network_edges, set_network_statenames, set_network_variable_card, parse_to_network
 from lbn.pre_computing import PreComputing
@@ -143,22 +144,19 @@ if __name__ == "__main__":
     # DOMAIN_FILE = '../../examples/DAF_v2/domain'
     # FORMULA_FILE = '../../examples/good_teacher/formula'
     # DOMAIN_FILE = '../../examples/good_teacher/domain'
-    lift_flag = False
+
     network = parse_to_network(FORMULA_FILE, DOMAIN_FILE)
-    # analysis_network(network, lift_flag)
 
-
-    network = pre_computing(network)
-
+    # network = pre_computing(network)
     BN_model = generate_bayesian_network(network)
     print(BN_model.check_model())
+
+
+    starttime = datetime.datetime.now()
+
     infer = VariableElimination(BN_model)
     print(infer.query(["CityRatingDrop"]))
+    endtime = datetime.datetime.now()
+    print(endtime - starttime)
 
-    # text1 = ["||Drives(x)||_x >= 0.4 & ||Drives(x)||_x > 0.5 ", "AirIsGood & ||Drives(x)||_x >= 0.4",
-    #          "!AirIsGood & ||Drive||_x == 0.4", "||Drives(x)||_x = 1"]
-    #
-    # pattern = rf"(\|\|.*?\|\|.*? [>=<]=? \d\.?\d*)"
-    # regex = re.compile(pattern)
-    # for text in text1:
-    #     print(regex.findall(text))
+

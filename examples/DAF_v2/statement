@@ -1,0 +1,27 @@
+Drives::{ D : driver }
+self : 0.5
+
+Live::{ D : driver, C: city }
+self : 0.2
+
+AirIsGood::{ C : city }
+
+d :4 c: 2
+D_1 = T D2  D3 D4 L_d1_c1 L_d2_c1 L_d3_c1 L_d4_c1
+12
+
+
+D_1 =T, D_2 =T ,D3 = F, D4= T, L_d1_c1 = F, L_d2_c1 = T, L_d3_c1 = T, L_d4_c1 = T
+
+||Drives(d) | Live(d,c)||_d <= 0.5 : 0.8
+
+c = c1    :
+
+
+||Drives(d) AND Live(d,c) ||_d <= 0.5 : 0.8
+[F, T,F ,T]    0.5
+
+l_d1_c1 ,L_d2_c1, L_d3_c1, L_d4_c1 = [True, ......]   [F,ttt]  0.75
+P(||Live(d,c)||_d =  1
+
+||Drives(d) | Live(d,c)||_d > 0.5 : 0.6

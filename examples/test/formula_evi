@@ -1,0 +1,14 @@
+A::{A: a, W: w}
+self : 0.1
+
+B::{B:b, Y: y}
+self : 0.2
+
+C::{C: c, Z: z}
+self : 0.3
+
+D::{}
+self : 0.4
+
+E::{A : a, B: b, C: c, D : d, W:w}
+A(a,w) & ||B(b,y)||_y > 0.9 & ||C(c,z)||_c_z == 0.8 & D : 1

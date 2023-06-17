@@ -12,20 +12,26 @@ import numpy
 from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
+from lbn.pre_computing import PreComputing
+import datetime
+import time
 
 class LiftedBaysianNetwork(object):
     def __init__(self, network: Network, flag: bool):
         self.abstract_network = network
-        self.lifted_flag = flag
+        self.lifting_flag = flag
 
-    def get_lifted_nodes(self):
-        if self.lifted_flag:
-            return check_lifted_nodes(self.abstract_network)
+    def get_lifting_queue(self):
+        if self.lifting_flag:
+            return check_lifting_nodes(self.abstract_network)
+        else:
+            return []
 
     def build_LBN(self):
         network = self.abstract_network
         # node_topo_dict = {'IsInfectious' : ['IsInfctious_p1', 'IsInfctious_p2', ...,'IsInfctious_p4'  ],
         #  'IsDiagnosed' : ['IsDiagnosed_p1', ..., 'IsDiagnosed_pn'],
+
         node_topo_dict = self.get_node_topo_dict()
         node_evi_topo_dict = self.get_evi_topo_dict()
         value_dict = self.get_node_value_dict()
@@ -33,21 +39,19 @@ class LiftedBaysianNetwork(object):
         # print(rf'Evidences topo Nodes:{node_evi_topo_dict}')
         # print(value_dict)
         lbn_model = BayesianNetwork(self.get_edges())
-
+        lifting_queue = self.get_lifting_queue()
         for node in network.get_nodes():
-            if self.lifted_flag:
-                if node.get_name() in self.get_lifted_nodes():
-                    pass
-            else:
-                evi_topo_dict = node_evi_topo_dict[node.get_name()]
-                topo_value_dict = value_dict[node.get_name()]
-                for n in node_topo_dict[node.get_name()]:
-                    lbn_model.add_node(n)
-                    if not evi_topo_dict[n]:
-                        lbn_model.add_cpds(TabularCPD(variable=n, variable_card = 2, values = topo_value_dict[n]))
-                    else:
+            evi_topo_dict = node_evi_topo_dict[node.get_name()]
+            topo_value_dict = value_dict[node.get_name()]
+            for n in node_topo_dict[node.get_name()]:
+                lbn_model.add_node(n)
+                if not evi_topo_dict[n]:
+                    lbn_model.add_cpds(TabularCPD(variable=n, variable_card = 2, values = topo_value_dict[n]))
+                else:
 
-                        lbn_model.add_cpds(TabularCPD(variable=n, variable_card=2,values=topo_value_dict[n],evidence = evi_topo_dict[n],evidence_card=[2] * len(evi_topo_dict[n])))
+                    lbn_model.add_cpds(TabularCPD(variable=n, variable_card=2,values=topo_value_dict[n],
+                                                  evidence = evi_topo_dict[n],evidence_card=[2] * len(evi_topo_dict[n])))
+
         return lbn_model
 
     def get_edges(self):
@@ -68,8 +72,12 @@ class LiftedBaysianNetwork(object):
         # node_topo_dict = {'IsInfectious' : ['IsInfctious_p1', ...,'IsInfctious_p4'  ],
         #  'IsDiagnosed' : ['IsDiagnosed_p1', ..., 'IsDiagnosed_pn'],
         node_topo_dict = {}
+        lifting_list = self.get_lifting_queue()
         for node in self.abstract_network.get_nodes():
-            node_topo_dict[node.get_name()] = generate_n_nodenames_as_list(node)
+            if  node.get_name() in lifting_list:
+                node_topo_dict[node.get_name()] = [rf'{node.get_name()}']
+            else:
+                node_topo_dict[node.get_name()] = generate_n_nodenames_as_list(node)
         return node_topo_dict
 
     def get_evi_topo_dict(self):
@@ -88,81 +96,100 @@ class LiftedBaysianNetwork(object):
         evidences = network.get_evidences()
         nodes = network.get_nodes()
         edges = network.get_edges()
+        lifting_list = self.get_lifting_queue()
         for node in nodes:
-            evi_topo = {}
-            node_topo = node_topo_dict[node.get_name()]
-            for n in node_topo:
-                # root node
-                if not evidences[node.get_name()]:
-                    evi_topo[n] = []
-                else:
-                    if len(evidences[node.get_name()]) == 1:
-                        for evi_name in evidences[node.get_name()]:
-                            evi_node = network.get_node_from_name(evi_name)
-                            # as case IsDiagnosed_p1 evi_name: Is
-                            if (evi_name,node.get_name()) not in network.get_freq_edges()\
-                                    and evi_node.get_domain() == node.get_domain():
-                                temp_name = n
-
-                                evi_topo[n] = [str.replace(temp_name,node.get_name(),evi_node.get_name())]
-                            else:
-                                # as case AirIsGood , evi_name: Drive_x1
-                                # evidence node topo list = [Drive_x1, ...Drive_xn]
-                                evi_topo[n] = node_topo_dict[evi_name]
-
+            if node.get_name() in lifting_list:
+                evi_topo = {}
+                node_topo = node_topo_dict[node.get_name()]
+                for n in node_topo:
+                    # root node
+                    if not evidences[node.get_name()]:
+                        evi_topo[n] = []
                     else:
-                        # multi evidences
-                        topo_list = []
-                        for evi_name in evidences[node.get_name()]:
-                            evi_node = network.get_node_from_name(evi_name)
-                            if (evi_name, node.get_name()) not in network.get_freq_edges():
-                                both_set = set(evi_node.get_domain().keys()) & set(node.get_domain().keys())
-                                keyword_set = {item.lower() for item in both_set}
-                                my_dict = {}
-                                for s in keyword_set:
-                                    if '_' + s in n:
-                                        result = re.findall(rf'\_{s}[^\_]*', n)
-                                        my_dict[s] = result[0]
-                                res = evi_name
-                                for s in keyword_set:
-                                    res+=my_dict[s]
-                                # todo deal with B_x1_p1 with evidences IsDiagnosed_p1 ,
-                                #  and B_x1, but the fact that IsDiagnosed_x1_p1,
-                                #  seems fixed, tobe confirmed
-                                # topo_list.append(str.replace(temp_name, node.get_name(), evi_node.get_name()))
-                                topo_list.append(res)
-                            # for case which use frequency reduce the domain
-                            else:
-                                # case reduce domain totally
-                                # CiryRating  and drive(d)
-                                remain_para_set = set(evi_node.get_para().keys()) & set(node.get_para().keys())
-                                if not remain_para_set:
-                                    topo_list.extend(node_topo_dict[evi_name])
+                        # if len(evidences[node.get_name()]) == 1:
+                        #     for evi_name in evidences[node.get_name()]:
+                        #         evi_node = network.get_node_from_name(evi_name)
+                        #         # as case IsDiagnosed_p1 evi_name: Is
+                        #         # if (evi_name,node.get_name()) not in network.get_freq_edges()\
+                        #         #         and evi_node.get_domain() == node.get_domain():
+                        #         #     temp_name = n
+                        #         #
+                        #         #     evi_topo[n] = [str.replace(temp_name,node.get_name(),evi_node.get_name())]
+                        #         # else:
+                        #         #     # as case AirIsGood , evi_name: Drive_x1
+                        #         #     # evidence node topo list = [Drive_x1, ...Drive_xn]
+                        #         #     evi_topo[n] = node_topo_dict[evi_name]
+                        #         if (evi_name,node.get_name()) not in network.get_freq_edges():
+                        #             # A is evi for B
+                        #             # all the para in A should be exists in par
+                        #             if
+                        #
+                        #
+                        #
+                        #
+                        # else:
+                            # multi evidences
+                            topo_list = []
+                            for evi_name in evidences[node.get_name()]:
+                                evi_node = network.get_node_from_name(evi_name)
+                                if (evi_name, node.get_name()) not in network.get_freq_edges():
+                                    common_para_list = get_common_element_as_list(list(evi_node.get_domain().keys()), list(node.get_domain().keys()))
+                                    keyword_list = [item.lower() for item in common_para_list]
+                                    para_suffix_dict = {}
+                                    for s in keyword_list:
+                                        if '_' + s in n:
+                                            result = re.findall(rf'\_{s}[^\_]*', n)
+                                            para_suffix_dict[s] = result[0]
+                                    res = evi_name
+                                    for s in keyword_list:
+                                        res+=para_suffix_dict[s]
+                                    # todo deal with B_x1_p1 with evidences IsDiagnosed_p1 ,
+                                    #  and B_x1, but the fact that IsDiagnosed_x1_p1,
+                                    #  seems fixed, tobe confirmed
+                                    # topo_list.append(str.replace(temp_name, node.get_name(), evi_node.get_name()))
+                                    topo_list.append(res)
+                                # for case which use frequency reduce the domain
                                 else:
-                                    new_para_set = set()
-                                    result_set = set(re.findall(r"_([a-zA-Z0-9]+)", n))
-                                    for para in {element.lower() for element in remain_para_set}:
-                                        for data in result_set:
-                                            if para in data:
-                                                new_para_set.add(data)
-                                    for item in node_topo_dict[evi_name]:
-                                        flag = True
-                                        for p in new_para_set:
-                                            if p not in item:
-                                                flag = False
-                                        if flag == True:
-                                            topo_list.append(item)
-                        evi_topo[n] = topo_list
-
-            evi_topo_dict[node.get_name()] = evi_topo
-        return evi_topo_dict
+                                    # remain_para_list means that we need to evi_para_index one to one map to n_para_index
+                                    # that the para actually not be reduced
+                                    # for example n_x1 we need use remain x, to get evi_x1
+                                    sub_formula_list = get_sub_formula_set(network.get_distributions()[node.get_name()])
+                                    freq_suffixs = set()
+                                    for s in sub_formula_list:
+                                        if '||' in s and evi_node.get_name() + evi_node.get_lower_para_from_node()[0] in s:
+                                            matches = re.findall(r'\|\|(_[^| ]*)',s)
+                                            for match in matches:
+                                                for suffix in match.split('_')[1:]:
+                                                    freq_suffixs.add(suffix)
+                                    evi_para_list = list(evi_node.get_domain().keys())
+                                    remain_para_list = [str.lower(evi_para) for evi_para in evi_para_list if
+                                                        str.lower(evi_para) not in freq_suffixs]
+                                    if not remain_para_list:
+                                        topo_list.extend(node_topo_dict[evi_name])
+                                    else:
+                                        new_para_list = []
+                                        result_list = re.findall(r"_([a-zA-Z0-9]+)", n)
+                                        for para in remain_para_list:
+                                            for data in result_list:
+                                                if para in data:
+                                                    new_para_list.append(data)
+                                        for item in node_topo_dict[evi_name]:
+                                            flag = True
+                                            for p in new_para_list:
+                                                if p not in item:
+                                                    flag = False
+                                            if flag == True:
+                                                topo_list.append(item)
+                            evi_topo[n] = topo_list
+                evi_topo_dict[node.get_name()] = evi_topo
+            return evi_topo_dict
 
     def get_node_value_dict(self):
         network = self.abstract_network
         node_topo_list = self.get_node_topo_dict()
         evi_topo_list = self.get_evi_topo_dict()
-        # print(node_topo_list)
-        # print(evi_topo_list)
+        print(node_topo_list)
+        print(evi_topo_list)
         value_dict ={}
         for node in network.get_nodes():
             print(rf'-------')
@@ -179,16 +206,18 @@ class LiftedBaysianNetwork(object):
             else:
                 # get subformula in node_distribution
                 # sub_formula_list : {'||IsDiagnodes(p)||_p', '||IsDiagnosed(p) AND Attends(p,w)||_p'}
-                sub_formula_list = set()
-                for line_formula, value in node_distribution.items():
-                    temp_list = re.split(r' \& | or ', line_formula)
-                    for temp_sub_formula in temp_list:
-                        if '||' not in temp_sub_formula:
-                            temp_sub_formula = str.replace(temp_sub_formula, "!", "")
-                        else:
-                            temp_sub_formula = re.sub(r'\s*[<>=]+\s*[\d.]*', '', temp_sub_formula)
-                        sub_formula_list.add(temp_sub_formula)
-                print(rf'sub_formula_list : {sub_formula_list}')
+                # 优化了 抽象成一个函数
+                # sub_formula_list = set()
+                # for line_formula, value in node_distribution.items():
+                #     temp_list = re.split(r' \& | or ', line_formula)
+                #     for temp_sub_formula in temp_list:
+                #         if '||' not in temp_sub_formula:
+                #             temp_sub_formula = str.replace(temp_sub_formula, "!", "")
+                #         else:
+                #             temp_sub_formula = re.sub(r'\s*[<>=]+\s*[\d.]*', '', temp_sub_formula)
+                #         sub_formula_list.add(temp_sub_formula)
+                # print(rf'sub_formula_list : {sub_formula_list}')
+                sub_formula_set = get_sub_formula_set(node_distribution)
 
                 # grounding the node for example n : Attends_x1_p1, IsDiagnosed_p1
                 for n in node_topo_list[node.get_name()]:
@@ -202,7 +231,7 @@ class LiftedBaysianNetwork(object):
                         # sub_formula_value_dict : {'IsInfectious(p)': True, '||IsDiagnodes(p)||_p' : 0.3, '||IsDiagnosed(p) AND Attends(p,w)||_p': 0.2}
                         sub_formula_value_dict ={}
                         evi_node_list = [network.get_node_from_name(evi) for evi in network.get_evidences()[node.get_name()]]
-                        for sub_formula in sub_formula_list:
+                        for sub_formula in sub_formula_set:
                             # print(rf'current analysis the sub_formula: {sub_formula}')
                             if '||' not in sub_formula:
                                 # CiryRatingDrop: AirIsGood & ||Drive(d)||_d > 0.5; !AirIsGood
@@ -222,6 +251,14 @@ class LiftedBaysianNetwork(object):
                             else:
                                 # '||IsDiagnodes(p)||_p', '||IsDiagnosed(p) AND Attends(p,w)||_p', ||A(x,y) AND B(x,y,z)||_x_y
                                 # suffix_dict = {'p': n, 'x': m, 'y': q}
+                                conditional_flag = False
+                                changed_sub_formula = sub_formula
+                                conditional_formula =''
+
+                                if ' | ' in sub_formula:
+                                    conditional_flag = True
+                                    conditional_formula = re.findall(r' \| (.*?)\|\|', changed_sub_formula)[0]
+                                    changed_sub_formula = str.replace(changed_sub_formula, ' | ', ' AND ')
                                 suffix_dict = {}
                                 suffixes = [s.strip().replace('_', '') for s in sub_formula.split("||") if
                                             s.strip().startswith("_")]
@@ -241,16 +278,20 @@ class LiftedBaysianNetwork(object):
 
                                 # get result_list as [True, False, True, False,...]
                                 result_list = []
-                                changed_sub_formula = sub_formula
+                                conditional_list =[]
                                 changed_sub_formula = str.replace(changed_sub_formula, 'AND', 'and')
                                 changed_sub_formula = str.replace(changed_sub_formula, 'OR', 'or')
+                                if conditional_flag:
+                                    conditional_formula = str.replace(conditional_formula,'AND', 'and')
+                                    conditional_formula = str.replace(conditional_formula, 'OR', 'or')
                                 pattern = r"\|\|(.*?)\|\|"
-                                # todo conditonal proabbility || A(x) | B(x,y)||_x
-                                #  | should be deal
+                                # conditonal proabbility || A(x) | B(x,y)||_x
+                                # 在这里修改
                                 changed_sub_formula = re.search(pattern, changed_sub_formula).group(1)
-
                                 for suffix_enumerate in suffix_enumerate_list:
                                     temp_formula = changed_sub_formula
+                                    if conditional_flag:
+                                        temp_conditional_formula = conditional_formula
                                     topo_pairs = [evi_name for evi_name in evi_name_list if suffix_enumerate in evi_name]
                                     for evi_node in evi_node_list:
                                         evi_name_with_para = evi_node.get_name()+ evi_node.get_lower_para_from_node()[0]
@@ -259,17 +300,29 @@ class LiftedBaysianNetwork(object):
                                                 if evi_node.get_name() in topo:
                                                     new_value = str(evi_value_dict[topo])
                                                     temp_formula = str.replace(temp_formula,evi_name_with_para,new_value)
+                                                    # conditional frequency implemtation here
+                                                    if conditional_flag:
+                                                        temp_conditional_formula = str.replace(temp_conditional_formula, evi_name_with_para,
+                                                                                   new_value)
 
                                     # print(temp_formula)
-                                    eval_result = eval(temp_formula)
 
+                                    eval_result = eval(temp_formula)
                                     result_list.append(eval_result)
+                                    if conditional_flag:
+                                        conditional_eval_result = eval(temp_conditional_formula)
+                                        conditional_list.append(conditional_eval_result)
 
                                 # print(rf' when evi_value_dict as {evi_value_dict}')
                                 # print(rf' {sub_formula} with the result {result_list}')
                                 # caluate relative frequency value
+
                                 frequency_value = result_list.count(True)/baseline_counter
-                                sub_formula_value_dict[sub_formula] = frequency_value
+                                if conditional_flag:
+                                    conditional_value = conditional_list.count(True)/baseline_counter
+                                    sub_formula_value_dict[sub_formula] = frequency_value/conditional_value if conditional_value != 0 else 0
+                                else:
+                                    sub_formula_value_dict[sub_formula] = frequency_value
 
                             # print(rf'here:{sub_formula_value_dict}')
 
@@ -316,6 +369,23 @@ class LiftedBaysianNetwork(object):
 # for w
 #     w1
 
+def get_common_element_as_list(list1, list2):
+    return [l for l in list1 if l in list2]
+
+
+
+def get_sub_formula_set(distribution: dict):
+    sub_formula_set = set()
+    for line_formula, value in distribution.items():
+        temp_list = re.split(r' \& | or ', line_formula)
+        for temp_sub_formula in temp_list:
+            if '||' not in temp_sub_formula:
+                temp_sub_formula = str.replace(temp_sub_formula, "!", "")
+            else:
+                temp_sub_formula = re.sub(r'\s*[<>=]+\s*[\d.]*', '', temp_sub_formula)
+            sub_formula_set.add(temp_sub_formula)
+    return sub_formula_set
+
 def enumerate_key_value(d):
     keys = list(d.keys())
     value_lists = list(d.values())
@@ -325,7 +395,7 @@ def enumerate_key_value(d):
 
 
 
-def check_lifted_nodes(network: Network):
+def check_lifting_nodes(network: Network):
     # return the list of nodes which could be lifted.
     # lifted mean A(x) do not need to represent A_1,...A_n nodes with bool values,
     # could lifted as a node A(x) has the values= 0,...,n with frequency
@@ -334,26 +404,31 @@ def check_lifted_nodes(network: Network):
     distributions = network.get_distributions()
     print(children_dict)
     print(distributions)
-    lifted_nodes = []
+    lifting_nodes = []
     for node in nodes:
-        # end node do not necessary to check lifted
+        # end node do not necessary to check lifting
         flag = True
         if node.get_name() in children_dict:
             for child in children_dict[node.get_name()]:
                 for formula in distributions[child].keys():
                     # only for atom formula could use lifting node
+                    # the lifting node only as frequency atomic formula.
                     str = rf'||{node.get_name()}{node.get_lower_para_from_node()[0]}||'
-                    if node.get_name() in formula and rf'||{node.get_name()}{node.get_lower_para_from_node()[0]}||' not in formula:
+                    h1 = re.findall(rf"\|\|.*?{node.get_name()}.*?\|\|",formula)
+                    h2 = re.findall(node.get_name(),formula)
+                    if len(h1) != len(h2):
                         flag = False
+                    # if node.get_name() in formula and rf'||{node.get_name()}{node.get_lower_para_from_node()[0]}||' not in formula:
+                    #     flag = False
         else:
             flag = False
         if flag:
-            lifted_nodes.append(node.get_name())
-    return lifted_nodes
+            lifting_nodes.append(node.get_name())
+    return lifting_nodes
 
 
 def generate_n_nodenames_as_list(node: Node) -> list:
-    # From Node to LiftedNode which we need to release domain into every node
+    # From Node to Lifting Node which we need to release domain into every node
     # example node : name: Qualified, Domain:{'T': '4'}             -> Qualified[t~1], ... Qualified[t~4]
     #                name: GoodSchool, Domain:{}'                   -> GoodSchool
     #                name: Something, Domain: {'T': '4', 'S': '3'}  -> Something[t~1,s~1], ... Something[t~4,s~3]
@@ -382,8 +457,10 @@ if __name__ == "__main__":
     # DOMAIN_FILE = '../../examples/DAF_v2/domain'
     # FORMULA_FILE = '../../examples/good_teacher/formula'
     # DOMAIN_FILE = '../../examples/good_teacher/domain'
-    # FORMULA_FILE = '../../examples/drive_drink/formula'
+    # FORMULA_FILE = '../../examples/drive_drink/formula_v1'
     # DOMAIN_FILE = '../../examples/drive_drink/domain'
+
+
     FORMULA_FILE = '../../examples/drive_air_city/formula'
     DOMAIN_FILE = '../../examples/drive_air_city/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/formula'
@@ -394,13 +471,33 @@ if __name__ == "__main__":
     # DOMAIN_FILE = '../../examples/pre_computing_case/test_case/C_3_P_2/domain'
     # FORMULA_FILE = '../../examples/attend_grade_school/formula'
     # DOMAIN_FILE = '../../examples/attend_grade_school/domain'
+    # FORMULA_FILE = '../../examples/test/formula'
+    # DOMAIN_FILE = '../../examples/test/domain'
     #
     network = parse_to_network(FORMULA_FILE, DOMAIN_FILE)
-    lifted_flag = False
-    lbn = LiftedBaysianNetwork(network,lifted_flag)
-    lbn_model = lbn.build_LBN()
-    print(lbn_model.check_model())
-    infer = VariableElimination(lbn_model)
+    lifting_flag = True
+    # print(rf'nodes = { [n.get_name() for n in network.get_nodes()]}')
+    # network = PreComputing(network).optimize_network()
+    # print(f'the new network from Pre-Computing is {network}')
+    lbn = LiftedBaysianNetwork(network,lifting_flag)
+    # print(lbn.get_lifting_queue())
+    print(lbn.get_node_topo_dict())
+    print(lbn.get_evi_topo_dict())
+    # starttime = datetime.datetime.now()
+    # lbn_model = lbn.build_LBN()
+    # endtime = datetime.datetime.now()
+    # print(endtime - starttime)
+    # print(lbn_model.check_model())
+    # infer = VariableElimination(lbn_model)
     # print(infer.query(["IsShutDown_w1"]))
-    print(infer.query(["CityRatingDrop"]))
+    # print(infer.query(["CityRatingDrop"]))
+    # print(infer.query(["IsShutDown_w1"]))
 
+
+
+    # starttime = datetime.datetime.now()
+    # infer = VariableElimination(lbn_model)
+
+    # print(infer.query(["CityRatingDrop"]))
+    # endtime = datetime.datetime.now()
+    # print (endtime - starttime)

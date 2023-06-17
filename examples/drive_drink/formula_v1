@@ -1,0 +1,7 @@
+Drive::{D : driver}
+self : 0.5
+
+BlockedByTrafficJam::{D : driver}
+!Drive(d) : 0
+Drive(d) & ||Drive(d)||_d > 0.9 : 0.8
+Drive(d) & ||Drive(d)||_d <= 0.9 : 0.2

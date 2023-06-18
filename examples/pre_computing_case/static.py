@@ -1,9 +1,7 @@
 from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
-from lbn.input.network import *
-# BN_model = BayesianNetwork(
-#     [('GoodTeacher', 'GoodGrade'), ('GoodTeacher', 'Attends'), ('GoodGrade', 'GoodSchool'), ('Attends', 'GoodSchool')])
+
 BN_model = BayesianNetwork(
     [('GoodTeacher', 'GoodGrade'),('GoodTeacher', 'Attends')])
 cpd_gt = TabularCPD(

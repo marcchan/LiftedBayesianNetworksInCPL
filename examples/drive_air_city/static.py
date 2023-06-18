@@ -1,9 +1,7 @@
 from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
-from lbn.input.network import *
-# DAF_model = BayesianNetwork(
-#     [('Drives', 'Air_is_good')])
+
 DAF_model = BayesianNetwork(
     [('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')])
 # cpd_d = TabularCPD(
@@ -104,17 +102,13 @@ print(infer.query([ 'Drives', 'Air_is_good','Fined'], evidence={}))
 # DAF_model.save('model_file_1')
 
 
-# use bip file
-# BNN =  BayesianNetwork([('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')]).load('model_file')
-# infer = VariableElimination(BNN)
-
 # print(infer.query(["Fined"]))
 # print(f'----------\n Joint Probability: P(Fined, Air_is_good,Drives): \n{infer.query(["Fined","Drives","Air_is_good"])}')
 # from pgmpy.inference import VariableElimination, BeliefPropagation
 # from pgmpy.models import BayesianNetwork
 # from pgmpy.factors.discrete import TabularCPD
 #
-# # Define the Bayesian network structure
+# # Define the Bayesian Network structure
 # model = BayesianNetwork([('Drives', 'Air_is_good'), ('Air_is_good', 'Fined'), ('Drives', 'Fined')])
 #
 # # Define the conditional probability distributions (CPDs)

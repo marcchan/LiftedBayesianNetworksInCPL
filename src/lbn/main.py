@@ -8,7 +8,7 @@ import time
 from lbn.parse_formula_into_distribution import fill_data_into_values, fill_data_into_values_two
 from network_helper import set_network_edges, set_network_statenames, set_network_variable_card, parse_to_network
 from lbn.pre_computing import PreComputing
-from lbn.lifted_baysian_network import LiftedBaysianNetwork
+from lbn.grounding import Grounding
 
 def set_network_values(network):
     # TODO need to refactor
@@ -84,7 +84,7 @@ def set_network_basic_values(network):
 
 
 # def analysis_network(network, lifted_flag):
-#         lbn = LiftedBaysianNetwork(network, lifted_flag)
+#         lbn = Grounding(network, lifted_flag)
 #         lbn.check_lifted_nodes()
 
 
@@ -125,7 +125,7 @@ def generate_bayesian_network(network):
             print(
                 f'{variable} with variable_card:{variable_card}, evidence:{evidence},evi_card:{evidence_card}, state_names:{state_names}')
         return BN_model
-    # lbn = LiftedBaysianNetwork(network)
+    # lbn = Grounding(network)
 
 
 if __name__ == "__main__":

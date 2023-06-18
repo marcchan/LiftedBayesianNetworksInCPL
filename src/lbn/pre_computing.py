@@ -1,7 +1,7 @@
 import re
 from typing import Optional, Dict, Union, Any
 
-from lbn.input.network import Network
+from lbn.input.lifted_bayesian_network import LiftedBaysianNetwork
 from lbn.input.node import Node
 from itertools import product
 from lbn import network_helper
@@ -10,7 +10,7 @@ from lbn.network_helper import parse_to_network
 
 class PreComputing(object):
 
-    def __init__(self, network: Network):
+    def __init__(self, network: LiftedBaysianNetwork):
         self.network = network
         self.backup = network
         self.queue = check_necessary(network)
@@ -27,7 +27,7 @@ class PreComputing(object):
     def get_backup(self):
         return self.backup
 
-    def optimize_network(self) -> Network:
+    def optimize_network(self) -> LiftedBaysianNetwork:
         if len(self.queue) == 0:
             print('It is not necessary to do pre-computing for this network!!')
         else:
@@ -38,6 +38,83 @@ class PreComputing(object):
                 self.update_network(new_child_distribution, edge)
             print(f'\n ---PRE Computing END---\n\n')
         return self.network
+
+    # def generate_new_distribution(self, edge) -> Optional[dict[Union[str, Any], float]]:
+    #     network = self.get_network()
+    #     nodes = network.get_nodes()
+    #     parent_name, child_name = edge
+    #     parent_node = network.get_node_from_name(parent_name)
+    #     parent_distribution: dict = network.get_distributions()[parent_name]
+    #     parent_evidence = network.get_evidences()[parent_name]
+    #     child_evidences = network.get_evidences()[child_name]
+    #     child_distribution: dict = network.get_distributions()[child_name]
+    #     child_new_distribution = {}
+    #
+    #     if len(child_evidences) == 1:
+    #         # this model contains one and only one out arrow and this arrow is non freq arrow
+    #         # example: A -|-> B, B only has p(B|A) = x, P(B|!A) = y
+    #
+    #         parent_format = parent_node.get_name(
+    #         ) + parent_node.get_lower_para_from_node()[0]
+    #         if parent_format not in child_distribution.keys():
+    #             print('parent formula maybe has problem!!')
+    #             return None
+    #         else:
+    #             p_true_c = child_distribution[parent_format]
+    #             reverse_parent_format = '!' + parent_format
+    #             if reverse_parent_format not in child_distribution.keys():
+    #                 print(f'ERROR: Please check the formula of the node distribution:{parent_format}, False '
+    #                       f'probability miss')
+    #                 return None
+    #             else:
+    #                 p_false_c = child_distribution[reverse_parent_format]
+    #                 # print(parent_distribution)
+    #                 for condition, value in parent_distribution.items():
+    #                     #  if parent is root: self works also
+    #                     child_new_distribution[condition] = float(
+    #                         p_true_c) * float(value) + float(p_false_c) * (1 - float(value))
+    #                 # print(child_new_distribution)
+    #                 return child_new_distribution
+    #
+    #     elif len(child_evidences) > 1:
+    #         bool_seperate_dict, interval_seperate_dict = get_seperate_dict(
+    #             child_distribution, child_evidences)
+    #         print(f'bool_seperate_dict: {bool_seperate_dict}')
+    #         print(f'interval_seperate_dict: {interval_seperate_dict}')
+    #         evi_nodes = [node for node in nodes if node.get_name()
+    #                      in child_evidences]
+    #         new_seperate_dict = {key: list(map(lambda x: (x[0], x[1]), zip(extend_list(
+    #             value)[:-1], extend_list(value)[1:]))) for key, value in interval_seperate_dict.items()}
+    #
+    #         for key, value in bool_seperate_dict.items():
+    #             if key != parent_name:
+    #                 new_seperate_dict[key] = value
+    #
+    #         # print(new_seperate_dict)
+    #
+    #         def enumerate_key_value(d):
+    #             keys = list(d.keys())
+    #             value_lists = list(d.values())
+    #             combinations = product(*value_lists)
+    #             for combination in combinations:
+    #                 yield dict(zip(keys, combination))
+    #
+    #         for result in enumerate_key_value(new_seperate_dict):
+    #             print(result)
+    #             new_fomula_list = get_cond_from_dict(result, evi_nodes)
+    #             print(new_fomula_list)
+    #             value_dict = eval_dict_value(
+    #                 child_distribution, result, evi_nodes, parent_name)
+    #             print(f'value_dict:{value_dict}')
+    #             for p_formula, p_value in parent_distribution.items():
+    #                 new_list = str.split(
+    #                     p_formula,
+    #                     ' & ') + new_fomula_list if len(parent_evidence) > 0 else new_fomula_list
+    #                 new_formula = ' & '.join(new_list)
+    #                 child_new_distribution[new_formula] = float(
+    #                     value_dict[True]) * float(p_value) + float(value_dict[False]) * (1 - float(p_value))
+    #         print(f'\nnew child distribution: {child_new_distribution}\n')
+    #         return child_new_distribution
 
     def generate_new_distribution(self, edge) -> Optional[dict[Union[str, Any], float]]:
         network = self.get_network()
@@ -115,6 +192,7 @@ class PreComputing(object):
                         value_dict[True]) * float(p_value) + float(value_dict[False]) * (1 - float(p_value))
             print(f'\nnew child distribution: {child_new_distribution}\n')
             return child_new_distribution
+
 
     def update_network(self, child_distribution, edge):
         self.backup = self.network

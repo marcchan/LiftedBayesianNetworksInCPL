@@ -2,7 +2,7 @@
 from lbn.input.node import Node
 
 
-class Network(object):
+class LiftedBaysianNetwork(object):
 
     def __init__(self, nodes, distributions, evidences, domains):
         self.nodes = nodes

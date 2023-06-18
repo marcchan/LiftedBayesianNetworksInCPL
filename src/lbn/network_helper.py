@@ -1,5 +1,5 @@
 import re
-from lbn.input.network import Network
+from lbn.input.lifted_bayesian_network import LiftedBaysianNetwork
 from lbn.input.node import Node
 
 
@@ -154,7 +154,7 @@ def sort_nodes(nodes: list, evidences: dict) -> list:
     return ordered_nodes
 
 
-def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
+def parse_to_network(formula_file_path: str, domain_file_path: str) -> LiftedBaysianNetwork:
     unordered_nodes, distributions = parse_formula(
         read_file(formula_file_path))
     print(distributions)
@@ -163,7 +163,7 @@ def parse_to_network(formula_file_path: str, domain_file_path: str) -> Network:
     evidences = set_evidences_from_distributions(
         temp_nodes, distributions)
     nodes = sort_nodes(temp_nodes, evidences)
-    network = Network(nodes, distributions, evidences, domains)
+    network = LiftedBaysianNetwork(nodes, distributions, evidences, domains)
     set_network_edges(network)
     print(network)
     return network
@@ -205,7 +205,7 @@ def set_network_edges(network):
         print('have not inited nodes in set edges')
 
 
-def set_network_variable_card(network: Network):
+def set_network_variable_card(network: LiftedBaysianNetwork):
     network.set_variable_card(
         {node.get_name(): node.get_variable_card() for node in network.get_nodes()})
 

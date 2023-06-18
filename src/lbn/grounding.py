@@ -5,7 +5,7 @@ from itertools import product
 
 import numpy as np
 
-from lbn.input.network import Network
+from lbn.input.lifted_bayesian_network import LiftedBaysianNetwork
 from lbn.input.node import Node
 from lbn.network_helper import parse_to_network
 
@@ -16,8 +16,8 @@ from lbn.pre_computing import PreComputing
 import datetime
 
 
-class LiftedBaysianNetwork(object):
-    def __init__(self, network: Network, flag: bool):
+class Grounding(object):
+    def __init__(self, network: LiftedBaysianNetwork, flag: bool):
         self.abstract_network = network
         self.lifting_flag = flag
 
@@ -144,7 +144,7 @@ class LiftedBaysianNetwork(object):
                 # get subformula in node_distribution
                 # sub_formula_list : {'||IsDiagnodes(p)||_p', '||IsDiagnosed(p) AND Attends(p,w)||_p'}
                 sub_formula_set = get_sub_formula_set(node_distribution)
-
+                print(sub_formula_set)
                 # grounding the node for example n : Attends_x1_p1,
                 # IsDiagnosed_p1
                 for n in node_topo_list[node.get_name()]:
@@ -405,7 +405,7 @@ def enumerate_key_value(d):
         yield dict(zip(keys, combination))
 
 
-def check_lifting_nodes(network: Network):
+def check_lifting_nodes(network: LiftedBaysianNetwork):
     # return the list of nodes which could be lifted.
     # lifted mean A(x) do not need to represent A_1,...A_n nodes with bool values,
     # could lifted as a node A(x) has the values= 0,...,n with frequency
@@ -469,8 +469,8 @@ if __name__ == "__main__":
 
     # FORMULA_FILE = '../../examples/infectious_disease/formula'
     # DOMAIN_FILE = '../../examples/infectious_disease/domain'
-    FORMULA_FILE = '../../examples/infectious_disease/formula_v1'
-    DOMAIN_FILE = '../../examples/infectious_disease/domain'
+    # FORMULA_FILE = '../../examples/infectious_disease/formula_v1'
+    # DOMAIN_FILE = '../../examples/infectious_disease/domain'
     # FORMULA_FILE = '../../examples/DAF_v2/formula'
     # DOMAIN_FILE = '../../examples/DAF_v2/domain'
     # FORMULA_FILE = '../../examples/good_teacher/formula'
@@ -478,8 +478,8 @@ if __name__ == "__main__":
     # FORMULA_FILE = '../../examples/drive_drink/formula_v1'
     # DOMAIN_FILE = '../../examples/drive_drink/domain'
 
-    # FORMULA_FILE = '../../examples/drive_air_city/formula'
-    # DOMAIN_FILE = '../../examples/drive_air_city/domain'
+    FORMULA_FILE = '../../examples/drive_air_city/formula'
+    DOMAIN_FILE = '../../examples/drive_air_city/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/formula'
@@ -494,14 +494,14 @@ if __name__ == "__main__":
     network = parse_to_network(FORMULA_FILE, DOMAIN_FILE)
     lifting_flag = False
     # print(rf'nodes = { [n.get_name() for n in network.get_nodes()]}')
-    # network = PreComputing(network).optimize_network()
-    # print(f'the new network from Pre-Computing is {network}')
-    lbn = LiftedBaysianNetwork(network, lifting_flag)
+    network = PreComputing(network).optimize_network()
+    print(f'the new network from Pre-Computing is {network}')
+    grounding_network = Grounding(network, lifting_flag)
     # print(lbn.get_lifting_queue())
     # print(lbn.get_node_topo_dict())
     # print(lbn.get_evi_topo_dict())
     starttime = datetime.datetime.now()
-    lbn_model = lbn.build_LBN()
+    lbn_model = grounding_network.build_LBN()
     endtime = datetime.datetime.now()
     print(endtime - starttime)
     # print(lbn_model.check_model())
@@ -511,7 +511,7 @@ if __name__ == "__main__":
 
     starttime = datetime.datetime.now()
     infer = VariableElimination(lbn_model)
-    print(infer.query(["IsShutDown_w1"]))
-    # print(infer.query(["CityRatingDrop"]))
+    # print(infer.query(["IsShutDown_w1"]))
+    print(infer.query(["CityRatingDrop"]))
     endtime = datetime.datetime.now()
     print (endtime - starttime)

@@ -1,8 +1,8 @@
 from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
-from lbn.input.network import *
-# DAF_model = BayesianNetwork()
+from lbn.input.lifted_bayesian_network import *
+
 
 DAF_model = BayesianNetwork(
     [('Drives_x1', 'Air_is_good'), ('Drives_x2', 'Air_is_good'), ('Drives_x3', 'Air_is_good'),

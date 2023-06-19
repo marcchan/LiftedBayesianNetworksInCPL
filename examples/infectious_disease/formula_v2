@@ -1,13 +1,13 @@
 IsDiagnosed::{P: person}
-self : 0.1
+self : 0.24
 
 Attends::{P: person, W: workplace}
-self : 0.3
+self : 0.5
 
 IsShutDown::{W: workplace}
 ||IsDiagnosed(p) | Attends(p,w)||_p > 0 : 0.8
 ||IsDiagnosed(p) | Attends(p,w)||_p <= 0 : 0.3
 
 AllPeopleRemoteWorking::{}
-||IsShutDown||_w > 0.5 : 0.5
-||IsShutDown||_w <= 0.5: 0.1
+||IsShutDown(w)||_w > 0.5 : 0.5
+||IsShutDown(w)||_w <= 0.5: 0.1

@@ -412,8 +412,6 @@ def check_lifting_nodes(network: LiftedBaysianNetwork):
     nodes = network.get_nodes()
     children_dict = network.get_children_dict()
     distributions = network.get_distributions()
-    # print(children_dict)
-    # print(distributions)
     lifting_nodes = []
     for node in nodes:
         # end node do not necessary to check lifting
@@ -421,16 +419,13 @@ def check_lifting_nodes(network: LiftedBaysianNetwork):
         if node.get_name() in children_dict:
             for child in children_dict[node.get_name()]:
                 for formula in distributions[child].keys():
-                    # only for atom formula could use lifting node
-                    # the lifting node only as frequency atomic formula.
-                    str = rf'||{node.get_name()}{node.get_lower_para_from_node()[0]}||'
-                    h1 = re.findall(
-                        rf"\|\|.*?{node.get_name()}.*?\|\|", formula)
-                    h2 = re.findall(node.get_name(), formula)
-                    if len(h1) != len(h2):
+                    # 比较A(x) ||A(x)|| 出现的次数是否一致即可， ||... A(x) ...|| 就代表着 A(x)出现的次数 > ||A(x)||
+                    node_with_para = node.get_name() + node.get_lower_para_from_node()[0]
+                    node_with_para_in_freq = '||'+ node_with_para + '||'
+                    h1 = re.findall(re.escape(node_with_para_in_freq), formula)
+                    h2 = re.findall(re.escape(node_with_para), formula)
+                    if len(h1) != len(h2) :
                         flag = False
-                    # if node.get_name() in formula and rf'||{node.get_name()}{node.get_lower_para_from_node()[0]}||' not in formula:
-                    #     flag = False
         else:
             flag = False
         if flag:
@@ -467,16 +462,15 @@ def generate_n_nodenames_as_list(node: Node) -> list:
 
 if __name__ == "__main__":
 
-    FORMULA_FILE = '../../examples/infectious_disease/formula'
-    DOMAIN_FILE = '../../examples/infectious_disease/domain'
+    # FORMULA_FILE = '../../examples/infectious_disease/formula'
+    # DOMAIN_FILE = '../../examples/infectious_disease/domain'
     # FORMULA_FILE = '../../examples/infectious_disease/formula_v1'
     # DOMAIN_FILE = '../../examples/infectious_disease/domain'
+    FORMULA_FILE = '../../examples/infectious_disease/formula_v2'
+    DOMAIN_FILE = '../../examples/infectious_disease/domain'
     # FORMULA_FILE = '../../examples/DAF_v2/formula'
     # DOMAIN_FILE = '../../examples/DAF_v2/domain'
-    # FORMULA_FILE = '../../examples/good_teacher/formula'
-    # DOMAIN_FILE = '../../examples/good_teacher/domain'
-    # FORMULA_FILE = '../../examples/drive_drink/formula_v1'
-    # DOMAIN_FILE = '../../examples/drive_drink/domain'
+
 
     # FORMULA_FILE = '../../examples/drive_air_city/formula'
     # DOMAIN_FILE = '../../examples/drive_air_city/domain'
@@ -492,21 +486,25 @@ if __name__ == "__main__":
     # DOMAIN_FILE = '../../examples/test/domain'
     #
     network = parse_to_network(FORMULA_FILE, DOMAIN_FILE)
-    lifting_flag = False
+    lifting_flag = True
     # print(rf'nodes = { [n.get_name() for n in network.get_nodes()]}')
-    network = PreComputing(network).optimize_network()
-    print(f'the new network from Pre-Computing is {network}')
-    grounding_network = Grounding(network, lifting_flag)
-    # print(lbn.get_lifting_queue())
-    print(grounding_network.get_node_grounding_dict())
-    print(grounding_network.get_evi_grounding_dict())
-    starttime = datetime.datetime.now()
-    lbn_model = grounding_network.build_LBN()
-    infer = VariableElimination(lbn_model)
-    print(infer.query(["IsShutDown_w1"]))
-    endtime = datetime.datetime.now()
-    print(endtime - starttime)
-    # print(lbn_model.check_model())
+    # network = PreComputing(network).optimize_network()
+    # print(check_lifting_nodes(network))
+
+    # print(f'the new network from Pre-Computing is {network}')
+    lbn = Grounding(network, lifting_flag)
+    print(lbn.get_lifting_queue())
+    print(lbn.get_node_grounding_dict())
+    print(lbn.get_evi_grounding_dict())
+    # starttime = datetime.datetime.now()
+    # lbn_model = grounding_network.build_LBN()
+    # infer = VariableElimination(lbn_model)
+    # print(infer.query(["IsShutDown_w1"]))
+    # endtime = datetime.datetime.now()
+    # print(endtime - starttime)
+
+
+
 
     # print(infer.query(["CityRatingDrop"]))
     # print(infer.query(["IsShutDown_w1"]))

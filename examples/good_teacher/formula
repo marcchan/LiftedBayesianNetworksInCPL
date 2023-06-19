@@ -1,9 +1,0 @@
-GoodTeacher::{ T : teacher }
-self : 0.5
-
-Teaches::{ T : teacher, S: student }
-self : 0.3
-
-GoodGrade::{ S : student }
-||GoodTeacher(t) AND Teaches(t,s)||_t  > 0.5 : 0.8
-||GoodTeacher(t) AND Teaches(t,s)||_t  <= 0.5 : 0.3

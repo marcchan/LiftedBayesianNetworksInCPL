@@ -187,7 +187,7 @@ def set_network_statenames(network):
 
 def set_network_edges(network):
     if len(network.get_nodes()) != 0:
-        edges, freq_edges = [], []
+        edges, lifted_edges = [], []
         for c_node, p_nodes in network.get_evidences().items():
             if len(p_nodes) != 0:
                 for p_node in p_nodes:
@@ -195,12 +195,12 @@ def set_network_edges(network):
                     for key, value in network.get_distributions()[
                         c_node].items():
                         if (len(re.findall(r'\|\|.*?' + p_node + '.*?\\|\\|', key))
-                            != 0) & (tuple([p_node, c_node]) not in freq_edges):
-                            freq_edges.append(tuple([p_node, c_node]))
+                            != 0) & (tuple([p_node, c_node]) not in lifted_edges):
+                            lifted_edges.append(tuple([p_node, c_node]))
         network.set_edges(edges)
-        network.set_freq_edges(freq_edges)
+        network.set_lifted_edges(lifted_edges)
         # print(network.get_edges())
-        # print(f'freq_edges{network.get_freq_edges()}')
+        # print(f'lifted_edges{network.get_lifted_edges()}')
     else:
         print('have not inited nodes in set edges')
 

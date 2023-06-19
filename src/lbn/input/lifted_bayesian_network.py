@@ -37,8 +37,8 @@ class LiftedBaysianNetwork(object):
     def get_edges(self):
         return self.edges
 
-    def get_freq_edges(self):
-        return self.freq_edges
+    def get_lifted_edges(self):
+        return self.lifted_edges
 
     def get_variable_card(self):
         return self.variable_card
@@ -78,7 +78,7 @@ class LiftedBaysianNetwork(object):
 
     def __str__(self):
         if self.edges:
-            return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n  edges:{self.edges}\n  lifted-edges:{self.freq_edges}\n------\n '
+            return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n  edges:{self.edges}\n  lifted-edges:{self.lifted_edges}\n------\n '
         else:
             return f'------\nNetwork:\n  nodes: {[node.to_str() for node in self.nodes]}\n  distributions: {self.distributions}\n  evidences: {self.evidences}\n  domains:{self.domains}\n------\n '
 
@@ -91,8 +91,8 @@ class LiftedBaysianNetwork(object):
     def set_edges(self, edges):
         self.edges = edges
 
-    def set_freq_edges(self, freq_edges):
-        self.freq_edges = freq_edges
+    def set_lifted_edges(self, lifted_edges):
+        self.lifted_edges = lifted_edges
 
     def set_variable_card(self, variable_card):
         self.variable_card = variable_card

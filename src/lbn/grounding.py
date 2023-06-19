@@ -27,22 +27,22 @@ class Grounding(object):
         else:
             return []
 
-    def get_node_topo_dict(self):
-        # node_topo_dict = {'IsInfectious' : ['IsInfctious_p1', ...,'IsInfctious_p4'  ],
+    def get_node_grounding_dict(self):
+        # node_grounding_dict = {'IsInfectious' : ['IsInfctious_p1', ...,'IsInfctious_p4'  ],
         #  'IsDiagnosed' : ['IsDiagnosed_p1', ..., 'IsDiagnosed_pn'],
-        node_topo_dict = {}
+        node_grounding_dict = {}
         lifting_list = self.get_lifting_queue()
         for node in self.abstract_network.get_nodes():
             if node.get_name() in lifting_list:
-                node_topo_dict[node.get_name()] = [node.get_name()]
+                node_grounding_dict[node.get_name()] = [node.get_name()]
             else:
-                node_topo_dict[node.get_name(
+                node_grounding_dict[node.get_name(
                 )] = generate_n_nodenames_as_list(node)
-        return node_topo_dict
+        return node_grounding_dict
 
-    def get_evi_topo_dict(self):
+    def get_evi_grounding_dict(self):
 
-        # evi_topo_dict = {
+        # evi_grounding_dict = {
         # 'IsInfectious': {'IsInfectious_p1': set(),...,'IsInfectious_pn': set() }
         # 'IsDiagnosed': {'IsDiagnosed_p1':{'IsInfectious_p1'},...,'IsInfectious_pn': {'IsInfectious_pn'} }
         # 'Attends': {'Attends_p1_w1': set(), 'Attends_p1_w2': set(), 'Attends_pn_wm': set()}
@@ -51,26 +51,26 @@ class Grounding(object):
         #  }
         # }
         network = self.abstract_network
-        node_topo_dict = self.get_node_topo_dict()
-        evi_topo_dict = {}
+        node_grounding_dict = self.get_node_grounding_dict()
+        evi_grounding_dict = {}
         evidences = network.get_evidences()
         nodes = network.get_nodes()
         edges = network.get_edges()
         lifting_list = self.get_lifting_queue()
 
         for node in nodes:
-            evi_topo = {}
-            node_topo = node_topo_dict[node.get_name()]
-            for n in node_topo:
+            evi_grounding = {}
+            node_grounding = node_grounding_dict[node.get_name()]
+            for n in node_grounding:
                 # root node
                 if not evidences[node.get_name()]:
-                    evi_topo[n] = []
+                    evi_grounding[n] = []
                 else:
-                    topo_list = []
+                    grounding_list = []
                     for evi_name in evidences[node.get_name()]:
                         evi_node = network.get_node_from_name(evi_name)
                         if (evi_name, node.get_name()
-                            ) not in network.get_freq_edges():
+                            ) not in network.get_lifted_edges():
                             common_para_list = get_common_element_as_list(
                                 list(evi_node.get_domain().keys()), list(node.get_domain().keys()))
                             keyword_list = [item.lower()
@@ -83,7 +83,7 @@ class Grounding(object):
                             res = evi_name
                             for s in keyword_list:
                                 res += para_suffix_dict[s]
-                            topo_list.append(res)
+                            grounding_list.append(res)
                         # for case which use frequency reduce the domain
                         else:
                             # remain_para_list means that we need to evi_para_index one to one map to n_para_index
@@ -104,7 +104,7 @@ class Grounding(object):
                             remain_para_list = [str.lower(evi_para) for evi_para in evi_para_list if
                                                 str.lower(evi_para) not in freq_suffixs]
                             if not remain_para_list:
-                                topo_list.extend(node_topo_dict[evi_name])
+                                grounding_list.extend(node_grounding_dict[evi_name])
                             else:
                                 new_para_list = []
                                 result_list = re.findall(r"_([a-zA-Z0-9]+)", n)
@@ -112,21 +112,21 @@ class Grounding(object):
                                     for data in result_list:
                                         if para in data:
                                             new_para_list.append(data)
-                                for item in node_topo_dict[evi_name]:
+                                for item in node_grounding_dict[evi_name]:
                                     flag = True
                                     for p in new_para_list:
                                         if p not in item:
                                             flag = False
                                     if flag:
-                                        topo_list.append(item)
-                    evi_topo[n] = topo_list
-            evi_topo_dict[node.get_name()] = evi_topo
-        return evi_topo_dict
+                                        grounding_list.append(item)
+                    evi_grounding[n] = grounding_list
+            evi_grounding_dict[node.get_name()] = evi_grounding
+        return evi_grounding_dict
 
     def get_node_value_dict(self):
         network = self.abstract_network
-        node_topo_list = self.get_node_topo_dict()
-        evi_topo_list = self.get_evi_topo_dict()
+        node_grounding_list = self.get_node_grounding_dict()
+        evi_grounding_list = self.get_evi_grounding_dict()
         value_dict = {}
         for node in network.get_nodes():
             print(rf'-------')
@@ -137,7 +137,7 @@ class Grounding(object):
             if not network.get_evidences()[node.get_name()]:
                 probability = float(node_distribution['self'])
                 value_list = [[probability], [1 - probability]]
-                for n in node_topo_list[node.get_name()]:
+                for n in node_grounding_list[node.get_name()]:
                     node_value_dict[n] = value_list
                 value_dict[node.get_name()] = node_value_dict
             else:
@@ -147,10 +147,10 @@ class Grounding(object):
                 print(sub_formula_set)
                 # grounding the node for example n : Attends_x1_p1,
                 # IsDiagnosed_p1
-                for n in node_topo_list[node.get_name()]:
-                    # print(rf'topo node :{n}')
-                    evi_name_list = evi_topo_list[node.get_name()][n]
-                    topo_value_list = []
+                for n in node_grounding_list[node.get_name()]:
+                    # print(rf'grounding node :{n}')
+                    evi_name_list = evi_grounding_list[node.get_name()][n]
+                    grounding_value_list = []
                     for evi_value_dict in enumerate_key_value(
                             {evi_n: [True, False] for evi_n in evi_name_list}):
                         # sub_formula_list : {'||IsDiagnodes(p)||_p', '||IsDiagnosed(p) AND Attends(p,w)||_p'}
@@ -243,16 +243,16 @@ class Grounding(object):
                                     temp_formula = changed_sub_formula
                                     if conditional_flag:
                                         temp_conditional_formula = conditional_formula
-                                    topo_pairs = [
+                                    grounding_pairs = [
                                         evi_name for evi_name in evi_name_list if suffix_enumerate in evi_name]
                                     for evi_node in evi_node_list:
                                         evi_name_with_para = evi_node.get_name(
                                         ) + evi_node.get_lower_para_from_node()[0]
                                         if evi_name_with_para in temp_formula:
-                                            for topo in topo_pairs:
-                                                if evi_node.get_name() in topo:
+                                            for grounding in grounding_pairs:
+                                                if evi_node.get_name() in grounding:
                                                     new_value = str(
-                                                        evi_value_dict[topo])
+                                                        evi_value_dict[grounding])
                                                     temp_formula = str.replace(
                                                         temp_formula, evi_name_with_para, new_value)
                                                     # conditional frequency
@@ -287,7 +287,7 @@ class Grounding(object):
 
                             # print(rf'here:{sub_formula_value_dict}')
 
-                        # get topo node n value dict
+                        # get grounding node n value dict
                         for cond, value in node_distribution.items():
                             temp_cond = str.replace(cond, '&', 'and')
                             temp_cond = str.replace(temp_cond, '!', 'not ')
@@ -297,12 +297,12 @@ class Grounding(object):
                             # print(temp_cond)
                             eval_value = eval(temp_cond)
                             if eval_value:
-                                topo_value_list.append(float(value))
+                                grounding_value_list.append(float(value))
                     # print(rf'evi_node_list_length:{len(evi_name_list)}')
-                    # print(rf'In {n} length of 1d - list:{len(topo_value_list)}')
-                    result_array = 1 - np.array(topo_value_list)
+                    # print(rf'In {n} length of 1d - list:{len(grounding_value_list)}')
+                    result_array = 1 - np.array(grounding_value_list)
                     combined_2d_array = np.vstack(
-                        (topo_value_list, result_array))
+                        (grounding_value_list, result_array))
                     node_value_dict[n] = combined_2d_array
                 value_dict[node.get_name()] = node_value_dict
         # print(value_dict)
@@ -310,48 +310,48 @@ class Grounding(object):
 
     def build_LBN(self):
         network = self.abstract_network
-        # node_topo_dict = {'IsInfectious' : ['IsInfctious_p1', 'IsInfctious_p2', ...,'IsInfctious_p4'  ],
+        # node_grounding_dict = {'IsInfectious' : ['IsInfctious_p1', 'IsInfctious_p2', ...,'IsInfctious_p4'  ],
         #  'IsDiagnosed' : ['IsDiagnosed_p1', ..., 'IsDiagnosed_pn'],
 
-        node_topo_dict = self.get_node_topo_dict()
-        print(rf'Grounding all Nodes:{node_topo_dict}')
-        node_evi_topo_dict = self.get_evi_topo_dict()
-        print(rf'Evidences topo Nodes:{node_evi_topo_dict}')
+        node_grounding_dict = self.get_node_grounding_dict()
+        print(rf'Grounding all Nodes:{node_grounding_dict}')
+        node_evi_grounding_dict = self.get_evi_grounding_dict()
+        print(rf'Evidences grounding Nodes:{node_evi_grounding_dict}')
         # print(value_dict)
         value_dict = self.get_node_value_dict()
         lbn_model = BayesianNetwork(self.get_edges())
 
         for node in network.get_nodes():
-            evi_topo_dict = node_evi_topo_dict[node.get_name()]
-            topo_value_dict = value_dict[node.get_name()]
-            for n in node_topo_dict[node.get_name()]:
+            evi_grounding_dict = node_evi_grounding_dict[node.get_name()]
+            grounding_value_dict = value_dict[node.get_name()]
+            for n in node_grounding_dict[node.get_name()]:
                 lbn_model.add_node(n)
-                if not evi_topo_dict[n]:
+                if not evi_grounding_dict[n]:
                     lbn_model.add_cpds(
                         TabularCPD(
                             variable=n,
                             variable_card=2,
-                            values=topo_value_dict[n]))
+                            values=grounding_value_dict[n]))
                 else:
 
                     lbn_model.add_cpds(TabularCPD(variable=n,
                                                   variable_card=2,
-                                                  values=topo_value_dict[n],
-                                                  evidence=evi_topo_dict[n],
-                                                  evidence_card=[2] * len(evi_topo_dict[n])))
+                                                  values=grounding_value_dict[n],
+                                                  evidence=evi_grounding_dict[n],
+                                                  evidence_card=[2] * len(evi_grounding_dict[n])))
         return lbn_model
 
     def get_edges(self):
         nodes = self.abstract_network.get_nodes()
-        node_evi_topo_dict = self.get_evi_topo_dict()
-        node_topo_dict = self.get_node_topo_dict()
+        node_evi_grounding_dict = self.get_evi_grounding_dict()
+        node_grounding_dict = self.get_node_grounding_dict()
         edges = []
         for node in nodes:
             if network.get_evidences():
-                evi_topo_dict = node_evi_topo_dict[node.get_name()]
-                for n in node_topo_dict[node.get_name()]:
-                    evi_topo = evi_topo_dict[n]
-                    for p_n in evi_topo:
+                evi_grounding_dict = node_evi_grounding_dict[node.get_name()]
+                for n in node_grounding_dict[node.get_name()]:
+                    evi_grounding = evi_grounding_dict[n]
+                    for p_n in evi_grounding:
                         edges.append((p_n, n))
         return edges
 
@@ -467,8 +467,8 @@ def generate_n_nodenames_as_list(node: Node) -> list:
 
 if __name__ == "__main__":
 
-    # FORMULA_FILE = '../../examples/infectious_disease/formula'
-    # DOMAIN_FILE = '../../examples/infectious_disease/domain'
+    FORMULA_FILE = '../../examples/infectious_disease/formula'
+    DOMAIN_FILE = '../../examples/infectious_disease/domain'
     # FORMULA_FILE = '../../examples/infectious_disease/formula_v1'
     # DOMAIN_FILE = '../../examples/infectious_disease/domain'
     # FORMULA_FILE = '../../examples/DAF_v2/formula'
@@ -478,8 +478,8 @@ if __name__ == "__main__":
     # FORMULA_FILE = '../../examples/drive_drink/formula_v1'
     # DOMAIN_FILE = '../../examples/drive_drink/domain'
 
-    FORMULA_FILE = '../../examples/drive_air_city/formula'
-    DOMAIN_FILE = '../../examples/drive_air_city/domain'
+    # FORMULA_FILE = '../../examples/drive_air_city/formula'
+    # DOMAIN_FILE = '../../examples/drive_air_city/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/formula'
@@ -498,10 +498,12 @@ if __name__ == "__main__":
     print(f'the new network from Pre-Computing is {network}')
     grounding_network = Grounding(network, lifting_flag)
     # print(lbn.get_lifting_queue())
-    # print(lbn.get_node_topo_dict())
-    # print(lbn.get_evi_topo_dict())
+    print(grounding_network.get_node_grounding_dict())
+    print(grounding_network.get_evi_grounding_dict())
     starttime = datetime.datetime.now()
     lbn_model = grounding_network.build_LBN()
+    infer = VariableElimination(lbn_model)
+    print(infer.query(["IsShutDown_w1"]))
     endtime = datetime.datetime.now()
     print(endtime - starttime)
     # print(lbn_model.check_model())
@@ -509,9 +511,8 @@ if __name__ == "__main__":
     # print(infer.query(["CityRatingDrop"]))
     # print(infer.query(["IsShutDown_w1"]))
 
-    starttime = datetime.datetime.now()
-    infer = VariableElimination(lbn_model)
-    # print(infer.query(["IsShutDown_w1"]))
-    print(infer.query(["CityRatingDrop"]))
-    endtime = datetime.datetime.now()
-    print (endtime - starttime)
+    # starttime = datetime.datetime.now()
+
+    # print(infer.query(["CityRatingDrop"]))
+    # endtime = datetime.datetime.now()
+    # print (endtime - starttime)

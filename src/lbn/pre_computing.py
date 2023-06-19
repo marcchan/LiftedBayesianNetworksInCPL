@@ -217,15 +217,15 @@ def check_necessary(network) -> list:
     # return the non_freq_arrow_set which
     # is necessary to deal with pre-computing
     network_helper.set_network_edges(network)
-    edges, freq_edges = network.get_edges(), network.get_freq_edges()
-    common_edges = set(edges) & set(freq_edges)
-    non_freq_edges = [edge for edge in edges if edge not in common_edges]
-    print(f'---non_freq_edges:{non_freq_edges}')
+    edges, lifted_edges = network.get_edges(), network.get_lifted_edges()
+    common_edges = set(edges) & set(lifted_edges)
+    non_lifted_edges = [edge for edge in edges if edge not in common_edges]
+    print(f'---non_lifted_edges:{non_lifted_edges}')
     result = []
 
     # strategy: only one out arrow with non freq could be optimized
     # 有且并有一条一条出边， 且出边都是non freq arrow
-    for (parent, child) in non_freq_edges:
+    for (parent, child) in non_lifted_edges:
         # out arrow only one
         if len(network.get_children_dict()[parent]) == 1:
             result.append((parent, child))

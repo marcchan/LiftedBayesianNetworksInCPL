@@ -5,8 +5,8 @@ Attends::{P: person, W: workplace}
 self : 0.5
 
 IsShutDown::{W: workplace}
-||IsDiagnosed(p) AND Attends(p,w)||_p > 0 : 0.8
-||IsDiagnosed(p) AND Attends(p,w)||_p <= 0 : 0.3
+||IsDiagnosed(p) AND Attends(p,w)||_p > 0 or ||IsDiagnosed(p)||_p >= 0.1 : 0.8
+||IsDiagnosed(p) AND Attends(p,w)||_p <= 0 & ||IsDiagnosed(p)||_p < 0.1 : 0.3
 
 AllPeopleRemoteWorking::{}
 ||IsShutDown(w)||_w > 0.5 : 0.5

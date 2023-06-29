@@ -52,20 +52,20 @@ Throughout, a name is an alphanumeric string using Upper-Camel-Case and generall
 
 CPLFormulas are composed of n number of conditional probability formula(s), n ∈ ℕ⁰. Let ϕ and ϕ̂ be 2 conditional probability formulas. The syntax of logic symbols in the program is as follows:
 
-- Relative frequency of the form: $$\|\phi(x) \ \mid\  \varphi(x,y)\|\_x$$
+- Relative frequency of the form: $$\|\|\phi(x) \ \mid\  \varphi(x,y)\|\|\_x$$
 - a negation of the form:$$ !\phi(x)$$
 - a conjunction of the form is divided into two situations(attention: a space interval), that is more convenience to parse the formula:
-  -  In frequency area: $$\|\phi(x)\  \ AND \ \  \varphi(x,y)\|\_x $$
+  -  In frequency area: $$\|\|\phi(x)\  \ AND \ \  \varphi(x,y)\|\|\_x $$
   -  In normal: $$\phi(x)\  \And\  \varphi(y)$$
 - a disjunction of the form(attention: a space interval), avoid using $"\mid"$ to confuse frequency symbol and conditional symbol, is also divided into two situations:
-  - In frequency area: $$\|\phi(x) \ \  OR \ \  \varphi(x,y)\|\_x $$
+  - In frequency area: $$\|\|\phi(x) \ \  OR \ \  \varphi(x,y)\|\|\_x $$
   - In normal: $$\phi(x)\ \  or\  \ \varphi(y)$$
 - the implies of the form: $\phi \to \varphi$ not be used instead of applying the following form to represent the implied meaning 
   - $$ !\phi\  or\  \varphi$$
 - universal quantification of the form (relative frequency can seem quantifier-free): 
-  - Applying frequency is 1 to represent FORALL: $$\|\phi(x) \|\_x == 1$$
+  - Applying frequency is 1 to represent FORALL: $$\|\|\phi(x) \|\|\_x == 1$$
 - existential quantification of the form:
-  - Applying frequency `> 0` to represent EXIST: $$\|\phi(x) \|\_x\ &gt; 0$$
+  - Applying frequency `> 0` to represent EXIST: $$\|\|\phi(x) \|\|\_x\ &gt; 0$$
 
 Additionally, for a root node, using the form as $$\textbf{self} :\   Probability $$ that means the node in domain D with the uniform distribution with a given probability. In our program, the root node must simply be an independent Bernoulli trial (some percentage true, some percentage false), because it does not depend on anything else for its probability. 
 

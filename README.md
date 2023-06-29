@@ -65,7 +65,7 @@ CPLFormulas are composed of n number of conditional probability formula(s), n âˆ
 - universal quantification of the form (relative frequency can seem quantifier-free): 
   - Applying frequency is 1 to represent FORALL: $$\|\phi(x) \|\_x == 1$$
 - existential quantification of the form:
-  - Applying frequency `> 0` to represent EXIST: $$\|\phi(x) \|\_x\  \> 0$$
+  - Applying frequency `> 0` to represent EXIST: $$\|\phi(x) \|\_x\ \> 0$$
 
 Additionally, for a root node, using the form as $$\textbf{self} :\   Probability $$ that means the node in domain D with the uniform distribution with a given probability. In our program, the root node must simply be an independent Bernoulli trial (some percentage true, some percentage false), because it does not depend on anything else for its probability. 
 

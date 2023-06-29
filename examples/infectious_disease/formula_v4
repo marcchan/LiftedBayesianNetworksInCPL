@@ -1,12 +1,12 @@
 IsDiagnosed::{P: person}
-self : 0.24
+self : 0.15
 
-Attends::{P: person, W: workplace}
+Attends::{P: person}
 self : 0.5
 
 B::{P: person}
 self : 0.3
 
-IsShutDown::{W: workplace}
-||B(p)||_p > 0.5 or ||IsDiagnosed(p) AND Attends(p,w)||_p > 0 : 0.8
-!||B(p)||_p > 0.5 & ||IsDiagnosed(p) AND Attends(p,w)||_p <= 0 : 0.3
+IsShutDown::{}
+||B(p)||_p > 0.5 or ||IsDiagnosed(p) AND Attends(p)||_p > 0 : 0.8
+!||B(p)||_p > 0.5 & ||IsDiagnosed(p) AND Attends(p)||_p <= 0 : 0.3

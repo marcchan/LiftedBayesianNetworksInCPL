@@ -133,3 +133,4 @@ print(infer.query([ 'Drives', 'Air_is_good','Fined'], evidence={}))
 # query = infer.query(['Fined'], evidence={})
 # print(query)
 
+

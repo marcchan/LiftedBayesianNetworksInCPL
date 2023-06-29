@@ -1,46 +1,12 @@
 # Lifted Bayesian Networks In Conditional Probability Logic
 ## Project Introduction:
-This project is based on Paper:[Statistical Relational Artificial Intelligence with Relative Frequencies: A Contribution to Modelling and Transfer Learning across Domain Sizes](https://epub.ub.uni-muenchen.de/76444/) by Dr.Felix Weitkämper.
-
-[//]: # ( Currently is mainly a typical LBN-CPL example.)
-
-[//]: # (### Example Description:)
-
-[//]: # (A very simple example in LBN-CPL is:)
-
-[//]: # (The likelihood of a driver being fined depends on two factors:)
-
-[//]: # (the air quality and the  frequency of people driving:)
-
-[//]: # (* For every person, the probability of he drives is 50%)
-
-[//]: # (* When the frequence of drives less than a half, i.e. the number of drives people is less than a half, the probability of good air is 80%;otherwise, is 60%)
-
-[//]: # (* If the air is good, City will hardly be fined&#40;10%&#41;; if the air is not good and the frequency of drivers less than 70%, city will slightly be fined&#40;30%&#41;; if the air is not good and the frequency of drivers more than 70%, city will be fined be fined Very likely &#40;80%&#41;)
-
-[//]: # ()
-[//]: # (![]&#40;examples/drive_air_city/formulas_v2.png&#41;)
-
-[//]: # ()
-[//]: # ()
-[//]: # (#### Domain:)
-
-[//]: # (this example will be in the specify domain, for example:)
-
-[//]: # ()
-[//]: # (``Domain: {Paul, James, Alice,...}``)
-
-[//]: # ()
-[//]: # (#### GAP:)
-
-[//]: # ()
-[//]: # (![]&#40;examples/drive_air_city/GAP.png&#41;)
+This project is based on article: [Conditional probability logic, lifted Bayesian networks, and almost sure quantifier elimination](https://www.sciencedirect.com/science/article/pii/S0304397520304461) by Vera Koponen
+and Paper:[Statistical Relational Artificial Intelligence with Relative Frequencies: A Contribution to Modelling and Transfer Learning across Domain Sizes](https://epub.ub.uni-muenchen.de/76444/) by Dr.Weitkämper.
 
 
+LBN-CPL introduces relative frequencies into statistical relational artificial intelligence, and making Halpern III-type probabilities available. This project focuses on developing a program for LBN-CPL and proposes two approaches to improve the efficiency of network building and inference in some special cases
 
 ## Project requirements
-
-
 [Python](https://www.python.org/downloads/) 3.7 is required to run this project
 
 ### Suggestion: using conda env
@@ -55,134 +21,63 @@ Activate your Environment\
 Install the all needed dependencies\
 `pip install -r requirements.txt`
 
-[//]: # (##  Format Definition:)
-[//]: # ( ### Domain)
+------
 
-[//]: # ( * use json format, has 3 attribute: name, type and domain.)
 
-[//]: # (    * type currently has `int`, `bool`, `list`.)
+## Syntax
 
-[//]: # ( * For example:)
+### Domain
 
-[//]: # (    ```)
+A domain file contains all the finite variable domain information about a Lifted Bayesian Network, with each line of data corresponding to a variable's domain. Each line is in the format of a `<DomainVariableName> : <DomainValue>` pair, distinguished by the ":" symbol. 
 
-[//]: # (    {)
+Note that the names of the elements of D do not matter; all relevant information lies in the cardinalities of the sorts of D. The individual name doesn't make sense when the domain is large enough. The meaning of "lifted" actually does not care about the individual case.
 
-[//]: # (      "nodes": [)
+Domain value in our program is of the type Integer, which is common with a huge domain. In the example of an infectious disease, the node `Is_infectious` has the variable domain x, and x represents the people. For example, domain data is "people: 100" means the domain of people is 100, $\vec{x}$ is the tuple of x<sub>1</sub>, x<sub>2</sub>,...x<sub>100</sub>.
 
-[//]: # (        {)
+### Formula
 
-[//]: # (          "name": "Drives",)
+A formula file consists of each node including its formula. The format for each node is as follows:
 
-[//]: # (          "type": "int",)
+$$<NodeName>::\{<Parameter>\ :\ <DomainVariableName>,... \}$$
+    $$<CPLFormulas>\ :\ <Probability>$$
 
-[//]: # (          "domain":"4")
+Between 2 node formulas, there is a blank line for separation. 
 
-[//]: # (        },)
+#### NodeName
 
-[//]: # (        {)
+Throughout, a name is an alphanumeric string using Upper-Camel-Case and generally without any special symbols. For instance, "Is_infectious" should be "IsInfectious". The only case using underscores is '_' to represent the individual in the domain, e.g. "IsInfectious_x_1" means the first person in the domain of people x.
 
-[//]: # (          "name": "Air_is_good",)
+#### CPLFormulas
 
-[//]: # (          "type": "bool",)
+CPLFormulas are composed of n number of conditional probability formula(s), n ∈ ℕ⁰. Let ϕ and ϕ̂ be 2 conditional probability formulas. The syntax of logic symbols in the program is as follows:
 
-[//]: # (          "domain": "[True, False]")
+- Relative frequency of the form: $$\|\phi(x) \ \mid\  \varphi(x,y)\|\_x$$
+- a negation of the form:$$ !\phi(x)$$
+- a conjunction of the form is divided into two situations(attention: a space interval), that is more convenience to parse the formula:
+  -  In frequency area: $$\|\phi(x)\  \ AND \ \  \varphi(x,y)\|\_x $$
+  -  In normal: $$\phi(x)\  \And\  \varphi(y)$$
+- a disjunction of the form(attention: a space interval), avoid using $"\mid"$ to confuse frequency symbol and conditional symbol, is also divided into two situations:
+  - In frequency area: $$\|\phi(x) \ \  OR \ \  \varphi(x,y)\|\_x $$
+  - In normal: $$\phi(x)\ \  or\  \ \varphi(y)$$
+- the implies of the form: $\phi \to \varphi$ not be used instead of applying the following form to represent the implied meaning 
+  - $$ !\phi\  or\  \varphi$$
+- universal quantification of the form (relative frequency can seem quantifier-free): 
+  - Applying frequency is 1 to represent FORALL: $$\|\phi(x) \|\_x == 1$$
+- existential quantification of the form:
+  - Applying frequency $> 0$ to represent EXIST: $$\|\phi(x) \|\_x\  > 0$$
 
-[//]: # (        },)
+Additionally, for a root node, using the form as $$\textbf{self} :\  < Probability >$$ that means the node in domain D with the uniform distribution with a given probability. In our program, the root node must simply be an independent Bernoulli trial (some percentage true, some percentage false), because it does not depend on anything else for its probability. 
 
-[//]: # (        {)
+### LBN-CPL Example: Drive Model
+We assume the City Rating dropping depends on 2 factors: the frequency
+of drivers driving on the road and the air quality. For each driver in the city
+of Shanghai, the probability of he/she driving on the road is 50%, When the
+frequency of drives is less than half, i.e. the number of drives for all drives in
+the city is less than half, the probability of good air quality is 80%; otherwise,
+is 60% (The negative impact of vehicle gas pollution on air quality). If the
+air quality is good, the City rating is hard to drop(10%); if the air is not
+good and the frequency of drivers driving on the road is less than 70%, the
+city rating has slightly possible to drop(30%); if the air is not good and the
+frequency of drivers more than 70%, the rating will drop very likely (80%)
 
-[//]: # (          "name": "Fined",)
-
-[//]: # (          "type": "bool",)
-
-[//]: # (          "domain": "[True, False]")
-
-[//]: # (        })
-
-[//]: # (      ])
-
-[//]: # (    })
-
-[//]: # (   ```)
-
-[//]: # ()
-[//]: # (###Formula)
-
-[//]: # (  * `<Nodename> ::`means the following formulas is for `<Nodename>`)
-
-[//]: # (  * Between 2 node formulas there are **`blank line`**  for separation.)
-
-[//]: # (  * Probabilistic logic symbol map:)
-
-[//]: # (    * **`!`**: not)
-
-[//]: # (    * **`|| A ||`**:  the frequence of node A)
-
-[//]: # (    * **`&`**: logical AND)
-
-[//]: # (    * **`|`**: logical OR)
-
-[//]: # (    * **`¬`**: logical NOT)
-
-[//]: # (  * **Example**:)
-
-[//]: # (      ```)
-
-[//]: # (        Drives::)
-
-[//]: # (        0.5)
-
-[//]: # (        )
-[//]: # (        Air_is_good::)
-
-[//]: # (        ||Drives <= 0.5|| : 0.8)
-
-[//]: # (        ||Drives > 0.5|| : 0.6)
-
-[//]: # (        )
-[//]: # (        Fined::)
-
-[//]: # (        Air_is_good : 0.1)
-
-[//]: # (        !Air_is_good & ||Drives >= 0.7|| : 0.8)
-
-[//]: # (        !Air_is_good & ||Drives < 0.7|| : 0.3)
-
-[//]: # (      ```)
-
-[//]: # ()
-[//]: # (        )
-[//]: # (### Change Formula V_1    )
-
-[//]: # ( * **Example**:)
-
-[//]: # (    * **Formula**)
-
-[//]: # (      ```)
-
-[//]: # (        Drives:: { X : people }    )
-
-[//]: # (        0.5)
-
-[//]: # (        )
-[//]: # (        Fined:: {})
-
-[//]: # (        ...)
-
-[//]: # (        )
-[//]: # (        attends:: { X : student })
-
-[//]: # (        ||attends&#40;x&#41; >= 0.95|| & ||good_grade&#40;x&#41; >= 0.30|| : 0.95)
-
-[//]: # (        ...)
-
-[//]: # (        )
-[//]: # (        friend :: { X : name, Y : name })
-
-[//]: # (        ...)
-
-[//]: # (        )
-[//]: # (        Teaches:: { X: Teacher, Y: student })
-
-[//]: # (        )
+![img.png](img.png)

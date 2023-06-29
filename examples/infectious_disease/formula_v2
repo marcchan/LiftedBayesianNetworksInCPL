@@ -1,5 +1,5 @@
 IsDiagnosed::{P: person}
-self : 0.24
+self : 0.15
 
 Attends::{P: person, W: workplace}
 self : 0.5

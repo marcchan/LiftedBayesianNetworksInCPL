@@ -38,8 +38,8 @@ Domain value in our program is of the type Integer, which is common with a huge 
 
 A formula file consists of each node including its formula. The format for each node is as follows:
 
-$$<NodeName>::\{<Parameter>\ :\ <DomainVariableName>,... \}$$
-    $$<CPLFormulas>\ :\ <Probability>$$
+$$\<NodeName\>::\{\<Parameter\>\ :\ \<DomainVariableName\>,... \}$$
+$$\<CPLFormulas\>\ :\ \<Probability\>$$
 
 Between 2 node formulas, there is a blank line for separation. 
 
@@ -64,9 +64,9 @@ CPLFormulas are composed of n number of conditional probability formula(s), n âˆ
 - universal quantification of the form (relative frequency can seem quantifier-free): 
   - Applying frequency is 1 to represent FORALL: $$\|\phi(x) \|\_x == 1$$
 - existential quantification of the form:
-  - Applying frequency $> 0$ to represent EXIST: $$\|\phi(x) \|\_x\  > 0$$
+  - Applying frequency `> 0` to represent EXIST: $$\|\phi(x) \|\_x\  \> 0$$
 
-Additionally, for a root node, using the form as $$\textbf{self} :\  < Probability >$$ that means the node in domain D with the uniform distribution with a given probability. In our program, the root node must simply be an independent Bernoulli trial (some percentage true, some percentage false), because it does not depend on anything else for its probability. 
+Additionally, for a root node, using the form as $$\textbf{self} :\  \< Probability \>$$ that means the node in domain D with the uniform distribution with a given probability. In our program, the root node must simply be an independent Bernoulli trial (some percentage true, some percentage false), because it does not depend on anything else for its probability. 
 
 ### LBN-CPL Example: Drive Model
 We assume the City Rating dropping depends on 2 factors: the frequency

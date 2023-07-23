@@ -174,7 +174,7 @@ class Grounding(object):
 
         network = self.abstract_network
         if self.lifting_flag:
-            lbn.update_info_lifting()
+            self.update_info_lifting()
         node_grounding_list = self.get_node_grounding_dict()
         evi_grounding_list = self.get_evi_grounding_dict()
         value_dict = {}
@@ -503,12 +503,13 @@ class Grounding(object):
         return lbn_model
 
     def get_edges(self):
+        network = self.abstract_network
         nodes = self.abstract_network.get_nodes()
         node_evi_grounding_dict = self.get_evi_grounding_dict()
         node_grounding_dict = self.get_node_grounding_dict()
         edges = []
         for node in nodes:
-            if network.get_evidences():
+            if network.get_evidences()[node.get_name()]:
                 evi_grounding_dict = node_evi_grounding_dict[node.get_name()]
                 for n in node_grounding_dict[node.get_name()]:
                     evi_grounding = evi_grounding_dict[n]
@@ -518,12 +519,13 @@ class Grounding(object):
 
 
     def get_basic_edges(self):
+        network = self.abstract_network
         nodes = self.abstract_network.get_nodes()
         node_basic_evi_dict = self.get_basic_evi_grounding_dict()
         node_grounding_dict = self.get_node_grounding_dict()
         edges = []
         for node in nodes:
-            if network.get_evidences():
+            if network.get_evidences()[node.get_name()]:
                 evi_grounding_dict = node_basic_evi_dict[node.get_name()]
                 for n in node_grounding_dict[node.get_name()]:
                     evi_grounding = evi_grounding_dict[n]
@@ -1055,18 +1057,12 @@ if __name__ == "__main__":
     # DOMAIN_FILE = '../../examples/infectious_disease/domain'
     # FORMULA_FILE = '../../examples/infectious_disease/formula_v1'
     # DOMAIN_FILE = '../../examples/infectious_disease/domain'
-    # FORMULA_FILE = '../../examples/infectious_disease/formula_v2'
-    # DOMAIN_FILE = '../../examples/infectious_disease/domain'
-    # FORMULA_FILE = '../../examples/infectious_disease/formula_v3'
-    # DOMAIN_FILE = '../../examples/infectious_disease/domain'
-    FORMULA_FILE = '../../examples/infectious_disease/formula_v4'
-    DOMAIN_FILE = '../../examples/infectious_disease/domain_v2'
-    # FORMULA_FILE = '../../examples/DAF_v2/formula'
-    # DOMAIN_FILE = '../../examples/DAF_v2/domain'
 
+    # FORMULA_FILE = '../../examples/infectious_disease_variant/formula_unideal_case'
+    # DOMAIN_FILE = '../../examples/infectious_disease_variant/domain_unideal_case'
 
-    # FORMULA_FILE = '../../examples/drive_air_city/formula'
-    # DOMAIN_FILE = '../../examples/drive_air_city/domain'
+    FORMULA_FILE = '../../examples/drive_air_city/formula'
+    DOMAIN_FILE = '../../examples/drive_air_city/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/formula'
     # DOMAIN_FILE = '../../examples/pre_computing_case/domain'
     # FORMULA_FILE = '../../examples/pre_computing_case/test_case/C_1_P_2/formula'
@@ -1081,11 +1077,11 @@ if __name__ == "__main__":
     network = parse_to_network(FORMULA_FILE, DOMAIN_FILE)
     lifting_flag = False
     # print(rf'nodes = { [n.get_name() for n in network.get_nodes()]}')
-    # network = PreComputing(network).optimize_network()
+    network = PreComputing(network).optimize_network()
     # print(check_lifting_nodes(network))
 
     # print(f'the new network from Pre-Computing is {network}')
-    basic_flag = False
+    basic_flag = True
     lbn = Grounding(network, lifting_flag, basic_flag)
     # print(lbn.get_basic_evi_grounding_dict())
     # print(lbn.get_basic_node_value_dict())
@@ -1123,10 +1119,10 @@ if __name__ == "__main__":
 
     starttime = datetime.datetime.now()
     #
-    # print(infer.query(["CityRatingDrop"]))
+    print(infer.query(["CityRatingDrop"]))
     # print(infer.query(["CityRatingDrop","Drive"]))
     # print(infer.query(["AllPeopleRemoteWorking"]))
-    print(infer.query(["IsShutDown"]))
+    # print(infer.query(["IsShutDown"]))
     # print(infer.query(["AllPeopleRemoteWorking","IsShutDown"]))
     # print(infer.query(
     #     ["AllPeopleRemoteWorking", "IsShutDown_w1", "IsShutDown_w2"]))

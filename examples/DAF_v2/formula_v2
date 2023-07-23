@@ -1,9 +1,0 @@
-Drives::{ D : driver }
-self : 0.5
-
-Live::{ D : driver, C: city }
-self : 0.3
-
-AirIsGood::{ C : city }
-||Drives(d) AND Live(d,c)||_d  <= 0.5 : 0.8
-||Drives(d) AND Live(d,c)||_d > 0.5 : 0.6

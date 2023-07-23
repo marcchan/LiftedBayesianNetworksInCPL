@@ -105,28 +105,6 @@ def set_evidences_from_distributions(nodes: list, distributions: dict) -> dict:
     return evidences
 
 
-# def sort_nodes(nodes: list, evidences: dict) -> list:
-#     """
-#
-#     :param evidences:
-#     :param nodes:  List[Node]
-#     :return: list with ordered nodes
-#     get the nodes list with order， which can take turn into bbn model
-#
-#     """
-#     ordered_nodes = []
-#     unfinished_nodes = set(nodes)
-#     while unfinished_nodes:
-#         cur_node = unfinished_nodes.pop()
-#         if not evidences[cur_node.get_name()]:
-#             ordered_nodes.append(cur_node)
-#         elif evidences[cur_node.get_name()].issubset(node.get_name() for node in ordered_nodes):
-#             ordered_nodes.append(cur_node)
-#         else:
-#             unfinished_nodes.add(cur_node)
-#     return ordered_nodes
-
-
 def sort_nodes(nodes: list, evidences: dict) -> list:
     """
 
@@ -208,35 +186,3 @@ def set_network_edges(network):
 def set_network_variable_card(network: LiftedBaysianNetwork):
     network.set_variable_card(
         {node.get_name(): node.get_variable_card() for node in network.get_nodes()})
-
-# def check_lifted_nodes(network: Network):
-#     # return the list of nodes which could be lifted.
-#     # lifted mean A(x) do not need to represent A_1,...A_n nodes with bool values,
-#     # could lifted as a node A(x) has the values= 0,...,n with frequency
-#     nodes =network.get_nodes()
-#     children_dict = network.get_children_dict()
-#     distributions = network.get_distributions()
-#     print(children_dict)
-#     print(distributions)
-#     lifted_nodes = []
-#     for node in nodes:
-#         # end node do not necessary to check lifted
-#         flag = True
-#         if node.get_name() in children_dict:
-#             print(node.get_name())
-#             for child in children_dict[node.get_name()]:
-#                 for formula in distributions[child].keys():
-#                     # only for atom formula could use lifting node
-#                     # the lifting node only as frequency atomic formula.
-#                     str = rf'\|\|{node.get_name()}{node.get_lower_para_from_node()[0]}\|\|'
-#                     h1 = re.findall(,formula)
-#                     h2 = re.findall(rf'{node.get_name()}{node.get_lower_para_from_node()[0]}',formula)
-#                     # if len(re.findall(str, formula)) != len(re.findall(rf'{node.get_name()}')) > 0:
-#
-#                     # if node.get_name() in formula and rf'||{node.get_name()}{node.get_lower_para_from_node()[0]}||' not in formula:
-#                     #     flag = False
-#         else:
-#             flag = False
-#         if flag:
-#             lifted_nodes.append(node.get_name())
-#     return lifted_nodes

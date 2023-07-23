@@ -1,0 +1,12 @@
+IsDiagnosed::{P: person}
+self : 0.15
+
+Attends::{P: person}
+self : 0.5
+
+SeriousInfected::{P: person}
+self : 0.3
+
+IsShutDown::{}
+||SeriousInfected(p)||_p > 0.5 or ||IsDiagnosed(p) AND Attends(p)||_p > 0 : 0.8
+||SeriousInfected:(p)||_p <= 0.5 & ||IsDiagnosed(p) AND Attends(p)||_p <= 0 : 0.3
